@@ -1,138 +1,138 @@
-# Aegis — Afet Sonrası Mahalle Dayanışma ve Kaynak Yönetim Sistemi
+# Aegis Frontend
 
-> **"Dayanıklı Şehir"** — Deprem, sel, yangın ve büyük kriz anlarında mahallelerin organize olmasını ve kaynakların yönetilmesini sağlayan dijital platform.
+> **Post-Disaster Neighborhood Solidarity and Resource Management System** — React + Vite
 
----
-
-## 🧭 Proje Hakkında
-
-Aegis, afet anında kritik soruları yanıtlamak için tasarlanmış çok aktörlü bir yönetim sistemidir:
-
-- Kim nerede, kim güvende, kim yardıma muhtaç?
-- Hangi binada risk var, hangi ailede yaşlı / çocuk / engelli birey var?
-- Hangi gönüllü ne iş biliyor, hangi depoda ne kadar stok var?
-- Yardım talebi kimden geldi, kim üstlendi, ne zaman çözüldü?
-
-Bu repository projenin **React tabanlı frontend** uygulamasını içermektedir.
+Backend repository: [AegisBackend](https://github.com/OzancanDirek/AegisBackend)
 
 ---
 
-## 🖥️ Ekranlar
+## About
 
-| Ekran | Açıklama |
+Aegis is a multi-actor management system designed to answer critical questions during a disaster:
+
+- Who is where, who is safe, who needs help?
+- Which buildings are at risk, which households have elderly / children / disabled individuals?
+- Which volunteer has which skills, how much stock is in each warehouse?
+- Who submitted an aid request, who took it, when was it resolved?
+
+This repository contains the **React-based frontend** of the application.
+
+---
+
+## Screens
+
+| Screen | Description |
 |---|---|
-| **Dashboard** | Aktif talepler, kritik stok uyarıları, gönüllü ve risk özeti |
-| **Kullanıcı Yönetimi** | Sistem kullanıcıları listesi ve detayları |
-| **Rol Yönetimi** | Kullanıcılara rol atama paneli |
-| **Gönüllüler** | Gönüllü listesi ve profil bilgileri |
-| **Yetenekler** | Yetenek/uzmanlık tanımları |
-| **Adres Yönetimi** | Adres ekleme, düzenleme, silme |
-| **Özel İhtiyaçlar** | Sakinlere özel ihtiyaç atama |
-| **Risk Haritası** | Türkiye il bazlı deprem risk haritası + canlı son deprem verisi |
-| **Depolar** | Stok ve depo yönetimi |
+| **Dashboard** | Active requests, critical stock alerts, volunteer and risk summary |
+| **User Management** | System users list and details |
+| **Role Management** | Role assignment panel for users |
+| **Volunteers** | Volunteer list and profile details |
+| **Skills** | Skill and expertise definitions |
+| **Address Management** | Add, edit and delete addresses |
+| **Special Needs** | Assign special needs to residents |
+| **Risk Map** | Province-based earthquake risk map + live earthquake data |
+| **Warehouses** | Stock and warehouse management |
 
 ---
 
-## 🗺️ Risk Haritası Özellikleri
+## Risk Map Features
 
-- Türkiye'nin 81 ili AFAD deprem bölgesi verisine göre 5 risk seviyesine ayrılmış
-- Risk seviyesine göre filtreleme (Çok Yüksek / Yüksek / Orta / Düşük)
-- İle tıklayınca fay hattı, nüfus ve aktif talep bilgisi
-- **Canlı son deprem verisi** — [api.orhanaydogdu.com.tr](https://api.orhanaydogdu.com.tr) üzerinden Kandilli Rasathanesi verisi
+- All 81 provinces of Turkey categorized into 5 risk levels based on AFAD earthquake zone data
+- Filter by risk level (Very High / High / Medium / Low)
+- Click on a province to see fault line, population and active request info
+- **Live earthquake data** via [api.orhanaydogdu.com.tr](https://api.orhanaydogdu.com.tr) — Kandilli Observatory
 
 ---
 
-## 🛠️ Teknoloji Stack
+## Tech Stack
 
-| Katman | Teknoloji |
+| Layer | Technology |
 |---|---|
 | Framework | React 18 |
 | Build Tool | Vite |
 | Routing | React Router DOM |
 | HTTP | Fetch API / Axios |
-| Harita | Leaflet.js |
-| Stil | CSS-in-JS (inline CSS strings) |
-| Font | Syne + DM Sans (Google Fonts) |
+| Map | Leaflet.js |
+| Styling | CSS-in-JS (inline CSS strings) |
+| Fonts | Syne + DM Sans (Google Fonts) |
 
 ---
 
-## 🚀 Kurulum
+## Getting Started
 
-### Gereksinimler
+### Prerequisites
 - Node.js 18+
-- npm veya yarn
-- Backend servisinin çalışıyor olması
+- npm or yarn
+- Backend service running
 
-### Adımlar
+### Steps
 
 ```bash
-# Repoyu klonla
 git clone https://github.com/OzancanDirek/AegisFrontend.git
 cd AegisFrontend
-
-# Bağımlılıkları yükle
 npm install
-
-# Geliştirme sunucusunu başlat
 npm run dev
 ```
 
-Uygulama `http://localhost:5173` adresinde çalışacaktır.
+App will be available at `http://localhost:5173`.
+
+### Map setup
+
+The risk map requires a WGS84 Turkey province GeoJSON file:
+
+1. Download for free from [simplemaps.com/gis/country/tr](https://simplemaps.com/gis/country/tr)
+2. Save the file as `public/tr-cities.json`
 
 ---
 
-## 🔗 Backend
+## Backend
 
-Bu frontend aşağıdaki backend servisiyle çalışmaktadır:
-
-| Servis | URL |
+| | |
 |---|---|
 | API Base URL | `http://localhost:8080/api` |
-| Backend Repo | *(backend repository linki buraya eklenecek)* |
+| Backend Repo | [AegisBackend](https://github.com/OzancanDirek/AegisBackend) |
 
-### Kullanılan Başlıca Endpointler
+### Key Endpoints Used
 
 ```
-GET  /api/residents/all
-POST /api/residents/{id}/special-needs
-GET  /api/special-needs/all
-GET  /api/addresses/allAdresses
-POST /api/addresses
-PUT  /api/addresses/{id}
+GET    /api/residents/all
+POST   /api/residents/{id}/special-needs
+GET    /api/special-needs/all
+GET    /api/addresses/allAdresses
+POST   /api/addresses
+PUT    /api/addresses/{id}
 DELETE /api/addresses/{id}
-GET  /api/UserRole/users
-GET  /api/UserRole/all
-POST /api/UserRole/assign
+GET    /api/UserRole/users
+GET    /api/UserRole/all
+POST   /api/UserRole/assign
 ```
 
 ---
 
-## 👥 Roller
+## User Roles
 
-Sistem aşağıdaki kullanıcı rollerini desteklemektedir:
-
-`ADMIN` · `MODERATOR` · `USER` · `GUEST` · `Mahalle Koordinatörü` · `Gönüllü` · `Depo Sorumlusu`
+`ADMIN` · `MODERATOR` · `USER` · `GUEST` · `Neighborhood Coordinator` · `Volunteer` · `Warehouse Manager`
 
 ---
 
-## 📁 Proje Yapısı
+## Project Structure
 
 ```
 aegis-frontend/
 ├── public/
-│   
+│   └── tr-cities.json         # Turkey province GeoJSON (add manually)
 ├── src/
-│   ├── images/               # Logo ve görseller
-│   ├── adminDashboard.jsx    # Ana dashboard
-│   ├── adminUsers.jsx        # Kullanıcı listesi
-│   ├── Adress.jsx            # Adres yönetimi
-│   ├── mapPage.jsx           # Risk haritası
+│   ├── images/                # Logo and assets
+│   ├── adminDashboard.jsx     # Main dashboard
+│   ├── adminUsers.jsx         # User list
+│   ├── Adress.jsx             # Address management
+│   ├── mapPage.jsx            # Risk map
 │   ├── ResidentSpecialNeeds.jsx
 │   ├── RoleManager.jsx
-│   ├── sidebar.jsx           # Global sidebar
+│   ├── sidebar.jsx            # Global sidebar
 │   ├── volunteers.jsx
 │   ├── skills.jsx
-│   └── main.jsx              # Route tanımları
+│   └── main.jsx               # Route definitions
 ├── index.html
 ├── package.json
 └── vite.config.js
@@ -140,28 +140,28 @@ aegis-frontend/
 
 ---
 
-## 🎨 Tasarım Sistemi
+## Design System
 
-Tüm sayfalar tutarlı bir dark theme üzerine inşa edilmiştir:
+All pages share a consistent dark theme:
 
-| Token | Değer |
+| Token | Value |
 |---|---|
 | Background | `#0d1117` |
 | Surface | `#161d27` |
 | Accent | `#F5A623` |
 | Text | `#e8f0fe` |
 | Muted | `#6b8099` |
-| Font Heading | Syne 800 |
-| Font Body | DM Sans 400/500 |
+| Heading Font | Syne 800 |
+| Body Font | DM Sans 400/500 |
 
 ---
 
-## 📌 Notlar
+## Notes
 
-- Backend CORS ayarı `http://localhost:5173` için yapılandırılmıştır
-- Uygulama şu an geliştirme aşamasındadır
-- Aktif talep sayısı gibi bazı veriler henüz statik, ilerleyen aşamada backend'den dinamik çekilecek
+- Backend CORS is configured for `http://localhost:5173`
+- Application is currently in development
+- Some data (e.g. active request count) is static for now and will be fetched dynamically from the backend in future iterations
 
 ---
 
-*Aegis Afet Yönetim Sistemi · v1.0.0 · 2026*
+*Aegis Disaster Management System · v1.0.0 · 2026*
