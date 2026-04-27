@@ -79,13 +79,6 @@ npm run dev
 
 Uygulama `http://localhost:5173` adresinde çalışacaktır.
 
-### Harita için ek adım
-
-Risk haritasının çalışması için WGS84 formatında Türkiye il GeoJSON dosyası gereklidir:
-
-1. [simplemaps.com/gis/country/tr](https://simplemaps.com/gis/country/tr) adresinden ücretsiz indirin
-2. İndirilen dosyayı `public/tr-cities.json` olarak kaydedin
-
 ---
 
 ## 🔗 Backend
@@ -127,7 +120,7 @@ Sistem aşağıdaki kullanıcı rollerini desteklemektedir:
 ```
 aegis-frontend/
 ├── public/
-│   └── tr-cities.json        # Türkiye il GeoJSON (manuel eklenir)
+│   
 ├── src/
 │   ├── images/               # Logo ve görseller
 │   ├── adminDashboard.jsx    # Ana dashboard
