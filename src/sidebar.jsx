@@ -97,6 +97,14 @@ const AlertIcon = () => (
     />
   </svg>
 );
+const TeamIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <circle cx="9" cy="8" r="3" fill="currentColor" opacity=".9" />
+    <circle cx="17" cy="8" r="3" fill="currentColor" opacity=".6" />
+    <path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6" fill="currentColor" opacity=".5" />
+    <path d="M11 20c.2-3 2.5-5 6-5s6 2 6 5" fill="currentColor" opacity=".35" />
+  </svg>
+);
 const MapIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
     <path
@@ -138,76 +146,126 @@ const SpecialNeedsIcon = () => (
     />
   </svg>
 );
+const InventoryIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <rect
+      x="3"
+      y="3"
+      width="18"
+      height="18"
+      rx="2"
+      fill="currentColor"
+      opacity=".2"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M7 8h10M7 12h10M7 16h6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
-const NAV_ITEMS = [
-  {
-    icon: <DashboardIcon />,
-    label: "Dashboard",
-    path: "/adminDashboard",
-    section: "genel",
-  },
-  {
-    icon: <UsersIcon />,
-    label: "Kullanıcılar",
-    path: "/adminUsers",
-    section: "genel",
-  },
-  {
-    icon: <VolunteerIcon />,
-    label: "Gönüllüler",
-    path: "/volunteers",
-    section: "genel",
-  },
-  {
-    icon: <UsersIcon />,
-    label: "Rol Yönetimi",
-    path: "/Admin/roles",
-    section: "genel",
-  },
-  {
-    icon: <SkillIcon />,
-    label: "Yetenekler",
-    path: "/skills",
-    section: "genel",
-  },
+// Her rol için gösterilecek menü öğeleri
+const NAV_BY_ROLE = {
+  Admin: [
+    {
+      section: "Genel",
+      items: [
+        {
+          icon: <DashboardIcon />,
+          label: "Dashboard",
+          path: "/adminDashboard",
+        },
+        { icon: <UsersIcon />, label: "Kullanıcılar", path: "/adminUsers" },
+        { icon: <VolunteerIcon />, label: "Gönüllüler", path: "/volunteers" },
+        { icon: <UsersIcon />, label: "Rol Yönetimi", path: "/admin/roles" },
+        { icon: <SkillIcon />, label: "Yetenekler", path: "/skills" },
+        { icon: <AddressIcon />, label: "Adresler", path: "/addresses" },
+        { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
+        {
+          icon: <SpecialNeedsIcon />,
+          label: "Özel İhtiyaçlar",
+          path: "/residentspecialneeds",
+        },
+      ],
+    },
+    {
+      section: "Operasyon",
+      items: [
+        {
+          icon: <AlertIcon />,
+          label: "Talepler",
+          path: "/requests",
+          badge: "3",
+        },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
+      ],
+    },
+  ],
 
-  {
-    icon: <AddressIcon />,
-    label: "Adresler",
-    path: "/addresses",
-    section: "genel",
-  },
-   {
-    icon: <SpecialNeedsIcon />,
-    label: "Özel İhtiyaçlar",
-    path: "/residentspecialneeds",
-    section: "genel",
-  },
-  {
-    icon: <AlertIcon />,
-    label: "Talepler",
-    path: "/requests",
-    section: "operasyon",
-    badge: "3",
-  },
-  { icon: <MapIcon />, label: "Harita", path: "/map", section: "operasyon" },
-  {
-    icon: <BoxIcon />,
-    label: "Depolar",
-    path: "/warehouses",
-    section: "operasyon",
-  },
-];
+  WAREHOUSE_MANAGER: [
+    {
+      section: "Depo",
+      items: [
+        { icon: <BoxIcon />, label: "Depolarım", path: "/warehouses" },
+        { icon: <InventoryIcon />, label: "Envanter", path: "/inventory" },
+      ],
+    },
+  ],
+
+  Gonullu: [
+    {
+      section: "Menü",
+      items: [
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <TeamIcon />, label: "Takımım", path: "/my-team" },
+        { icon: <VolunteerIcon />, label: "Profilim", path: "/volunteers" },
+      ],
+    },
+  ],
+
+  Calisan: [
+    {
+      section: "Menü",
+      items: [
+        {
+          icon: <DashboardIcon />,
+          label: "Dashboard",
+          path: "/adminDashboard",
+        },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
+        { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
+      ],
+    },
+  ],
+
+  Depremzede: [
+    {
+      section: "Menü",
+      items: [
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <AlertIcon />, label: "Yardım Talebi", path: "/requests" },
+      ],
+    },
+  ],
+};
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const role = localStorage.getItem("role") || "User";
+
+  const sections = NAV_BY_ROLE[role] || NAV_BY_ROLE["Depremzede"];
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
-
         .al-sidebar {
           grid-area: sidebar;
           background: #161d27;
@@ -242,36 +300,40 @@ export default function Sidebar() {
           border-radius: 20px; min-width: 20px; text-align: center;
         }
         .al-divider { height: 1px; background: #253045; margin: 14px 14px; }
+        .al-role-chip {
+          margin: 0 12px 16px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          background: rgba(245,166,35,.08);
+          border: 1px solid rgba(245,166,35,.2);
+          font-size: 11px; font-weight: 600;
+          color: #F5A623; font-family: 'DM Sans', sans-serif;
+          text-align: center; letter-spacing: .5px;
+        }
       `}</style>
 
       <aside className="al-sidebar">
-        <div className="al-nav-section">
-          <div className="al-nav-label">Genel</div>
-          {NAV_ITEMS.filter((i) => i.section === "genel").map((item) => (
-            <div
-              key={item.path}
-              className={`al-nav-item ${location.pathname === item.path ? "active" : ""}`}
-              onClick={() => navigate(item.path)}
-            >
-              {item.icon} {item.label}
-              {item.badge && <span className="al-badge">{item.badge}</span>}
+        {/* Rol etiketi */}
+        <div className="al-role-chip">{role}</div>
+
+        {sections.map((sec, i) => (
+          <div key={sec.section}>
+            {i > 0 && <div className="al-divider" />}
+            <div className="al-nav-section">
+              <div className="al-nav-label">{sec.section}</div>
+              {sec.items.map((item) => (
+                <div
+                  key={item.path}
+                  className={`al-nav-item ${location.pathname.toLowerCase() === item.path.toLowerCase() ? "active" : ""}`}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.icon} {item.label}
+                  {item.badge && <span className="al-badge">{item.badge}</span>}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="al-divider" />
-        <div className="al-nav-section">
-          <div className="al-nav-label">Operasyon</div>
-          {NAV_ITEMS.filter((i) => i.section === "operasyon").map((item) => (
-            <div
-              key={item.path}
-              className={`al-nav-item ${location.pathname === item.path ? "active" : ""}`}
-              onClick={() => navigate(item.path)}
-            >
-              {item.icon} {item.label}
-              {item.badge && <span className="al-badge">{item.badge}</span>}
-            </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </aside>
     </>
   );

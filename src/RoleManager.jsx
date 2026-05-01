@@ -5,6 +5,9 @@ import Sidebar from "./sidebar";
 
 const API = "http://localhost:8080/api/UserRole";
 
+// Token'ı her istekte otomatik ekleyen yardımcı fonksiyon
+import { authFetch } from "./authFetch";
+
 const ShieldIcon = () => (
   <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
 );
@@ -264,8 +267,8 @@ export default function RoleManager() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${API}/users`).then((r) => r.json()),
-      fetch(`${API}/all`).then((r) => r.json()),
+      authFetch(`${API}/users`).then((r) => r.json()),
+      authFetch(`${API}/all`).then((r) => r.json()),
     ])
       .then(([uData, rData]) => {
         setUsers(uData.users || []);
@@ -276,7 +279,7 @@ export default function RoleManager() {
   }, []);
 
   const loadUserRoles = async (userId) => {
-    const data = await fetch(`${API}/user/${userId}`).then((r) => r.json());
+    const data = await authFetch(`${API}/user/${userId}`).then((r) => r.json());
     return data.roles || [];
   };
 
@@ -292,7 +295,7 @@ export default function RoleManager() {
     if (!selected || !selectedRole) return;
     setAssigning(true);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `${API}/assign?userId=${getUserId(selected)}&roleId=${selectedRole}`,
         { method: "POST" },
       );
@@ -300,7 +303,7 @@ export default function RoleManager() {
       showToast(data.message || "Rol atandı!", "success");
       const updatedRoles = await loadUserRoles(getUserId(selected));
       setSelected((prev) => ({ ...prev, currentRoles: updatedRoles }));
-      const uData = await fetch(`${API}/users`).then((r) => r.json());
+      const uData = await authFetch(`${API}/users`).then((r) => r.json());
       setUsers(uData.users || []);
     } catch {
       showToast("Rol atanamadı", "error");

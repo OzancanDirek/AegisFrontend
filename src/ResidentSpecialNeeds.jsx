@@ -5,6 +5,60 @@ import Sidebar from "./sidebar";
 
 const API = "http://localhost:8080/api";
 
+// Token'ı her istekte otomatik ekleyen yardımcı fonksiyon
+import { authFetch } from "./authFetch";
+
+const PRIORITY_CONFIG = {
+  CRITICAL: {
+    label: "Kritik",
+    color: "#ef4444",
+    bg: "rgba(239,68,68,.12)",
+    border: "rgba(239,68,68,.35)",
+    icon: "🔴",
+  },
+  HIGH: {
+    label: "Yüksek",
+    color: "#f97316",
+    bg: "rgba(249,115,22,.12)",
+    border: "rgba(249,115,22,.35)",
+    icon: "🟠",
+  },
+  MEDIUM: {
+    label: "Orta",
+    color: "#F5A623",
+    bg: "rgba(245,166,35,.12)",
+    border: "rgba(245,166,35,.35)",
+    icon: "🟡",
+  },
+  LOW: {
+    label: "Düşük",
+    color: "#6b8099",
+    bg: "rgba(107,128,153,.12)",
+    border: "rgba(107,128,153,.35)",
+    icon: "⚪",
+  },
+};
+
+function calcPriority(needIds, allNeeds, birthDate) {
+  const selected = allNeeds.filter((n) => needIds.has(n.needId));
+  const hasMed = selected.some((n) =>
+    n.needName?.toLowerCase().includes("ilaç"),
+  );
+  const hasAny = selected.length > 0;
+
+  let age = null;
+  if (birthDate) {
+    age = Math.floor(
+      (new Date() - new Date(birthDate)) / (1000 * 60 * 60 * 24 * 365.25),
+    );
+  }
+
+  if (hasMed) return "CRITICAL";
+  if (age !== null && age > 65 && hasAny) return "HIGH";
+  if (hasAny) return "MEDIUM";
+  return "LOW";
+}
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,6 +111,7 @@ const CSS = `
   .sn-ucard-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: rgba(245,166,35,.15); border: 1.5px solid rgba(245,166,35,.4); color: var(--accent); }
   .sn-ucard-name { font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--font-head); }
   .sn-ucard-id { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .sn-ucard-meta { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
   .sn-section-lbl { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
   .sn-needs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .sn-need-card { padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 10px; position: relative; }
@@ -80,7 +135,22 @@ const CSS = `
   .sn-toast.success { background: rgba(62,207,90,.1); border-color: #3ecf5a; color: #3ecf5a; }
   .sn-toast.error { background: rgba(239,68,68,.1); border-color: #ef4444; color: #ef4444; }
   @keyframes snSlide { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  .sn-priority-pill { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; border: 1px solid; white-space: nowrap; flex-shrink: 0; font-family: var(--font-body); }
+  .sn-priority-preview { border-radius: var(--radius); border: 1px solid; padding: 13px 16px; display: flex; align-items: center; gap: 12px; transition: all .25s ease; }
+  .sn-priority-icon { font-size: 22px; flex-shrink: 0; }
+  .sn-priority-info { flex: 1; }
+  .sn-priority-lbl { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+  .sn-priority-val { font-family: var(--font-head); font-size: 16px; font-weight: 800; }
+  .sn-priority-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+  .sn-priority-change-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(62,207,90,.35); background: rgba(62,207,90,.1); color: #3ecf5a; animation: snSlide .2s ease; }
 `;
+
+const PRIORITY_DESC = {
+  CRITICAL: "İlaç bağımlılığı tespit edildi — acil müdahale gerekebilir",
+  HIGH: "65 yaş üstü & özel ihtiyaç mevcut — yüksek takip gerekli",
+  MEDIUM: "Özel ihtiyaç atanmış — düzenli takip önerilir",
+  LOW: "Henüz özel ihtiyaç yok — standart bakım yeterli",
+};
 
 const LogoutIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
@@ -103,14 +173,16 @@ export default function ResidentSpecialNeeds() {
   const [selectedNeedIds, setSelectedNeedIds] = useState(new Set());
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  const [savedPriority, setSavedPriority] = useState(null);
+  const [_prevPreviewPriority, setPrevPreviewPriority] = useState(null);
 
   const userName = localStorage.getItem("name") || "Admin";
 
   useEffect(() => {
-    fetch(`${API}/residents/all`)
+    authFetch(`${API}/residents/all`)
       .then((r) => r.json())
       .then((d) => setResidents(Array.isArray(d) ? d : []));
-    fetch(`${API}/special-needs/all`)
+    authFetch(`${API}/special-needs/all`)
       .then((r) => r.json())
       .then((d) => setNeeds(Array.isArray(d) ? d : []));
   }, []);
@@ -118,6 +190,8 @@ export default function ResidentSpecialNeeds() {
   const selectResident = (r) => {
     setSelectedResident(r);
     setSelectedNeedIds(new Set(r.specialNeeds?.map((n) => n.needId) || []));
+    setSavedPriority(r.priorityLevel || null);
+    setPrevPreviewPriority(null);
   };
 
   const toggleNeed = (id) => {
@@ -130,29 +204,59 @@ export default function ResidentSpecialNeeds() {
 
   const showToast = (msg, type) => {
     setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 3500);
   };
 
   const save = async () => {
     if (!selectedResident) return;
     setSaving(true);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `${API}/residents/${selectedResident.residentId}/special-needs`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify([...selectedNeedIds]),
         },
       );
-      if (res.ok) showToast("İhtiyaçlar başarıyla kaydedildi!", "success");
-      else showToast("Kayıt başarısız", "error");
+      if (res.ok) {
+        const data = await res.json();
+        const newPriority = data.priorityLevel;
+        setSavedPriority(newPriority);
+        setPrevPreviewPriority(null);
+        setResidents((prev) =>
+          prev.map((r) =>
+            r.residentId === selectedResident.residentId
+              ? {
+                  ...r,
+                  specialNeeds: data.specialNeeds,
+                  priorityLevel: newPriority,
+                }
+              : r,
+          ),
+        );
+        const cfg = PRIORITY_CONFIG[newPriority] || {};
+        showToast(
+          `İhtiyaçlar kaydedildi — Öncelik: ${cfg.label || newPriority}`,
+          "success",
+        );
+      } else {
+        showToast("Kayıt başarısız", "error");
+      }
     } catch {
       showToast("Sunucu hatası", "error");
     } finally {
       setSaving(false);
     }
   };
+
+  const livePreviewPriority = selectedResident
+    ? calcPriority(selectedNeedIds, needs, selectedResident.birthDate)
+    : null;
+
+  const priorityChanged =
+    savedPriority &&
+    livePreviewPriority &&
+    livePreviewPriority !== savedPriority;
 
   const filtered = residents.filter((r) =>
     r.fullName?.toLowerCase().includes(search.toLowerCase()),
@@ -216,24 +320,40 @@ export default function ResidentSpecialNeeds() {
                 {filtered.length === 0 ? (
                   <div className="sn-empty">Sakin bulunamadı</div>
                 ) : (
-                  filtered.map((r) => (
-                    <button
-                      key={r.residentId}
-                      className={`sn-res-btn ${selectedResident?.residentId === r.residentId ? "active" : ""}`}
-                      onClick={() => selectResident(r)}
-                    >
-                      <div className="sn-res-avatar">
-                        {r.fullName?.[0]?.toUpperCase()}
-                      </div>
-                      <div className="sn-res-info">
-                        <span className="sn-res-name">{r.fullName}</span>
-                        <span className="sn-res-id">#{r.residentId}</span>
-                      </div>
-                      {selectedResident?.residentId === r.residentId && (
-                        <div className="sn-active-dot" />
-                      )}
-                    </button>
-                  ))
+                  filtered.map((r) => {
+                    const p = r.priorityLevel;
+                    const cfg = PRIORITY_CONFIG[p];
+                    return (
+                      <button
+                        key={r.residentId}
+                        className={`sn-res-btn ${selectedResident?.residentId === r.residentId ? "active" : ""}`}
+                        onClick={() => selectResident(r)}
+                      >
+                        <div className="sn-res-avatar">
+                          {r.fullName?.[0]?.toUpperCase()}
+                        </div>
+                        <div className="sn-res-info">
+                          <span className="sn-res-name">{r.fullName}</span>
+                          <span className="sn-res-id">#{r.residentId}</span>
+                        </div>
+                        {cfg && (
+                          <span
+                            className="sn-priority-pill"
+                            style={{
+                              color: cfg.color,
+                              borderColor: cfg.border,
+                              background: cfg.bg,
+                            }}
+                          >
+                            {cfg.icon} {cfg.label}
+                          </span>
+                        )}
+                        {selectedResident?.residentId === r.residentId && (
+                          <div className="sn-active-dot" />
+                        )}
+                      </button>
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -269,7 +389,71 @@ export default function ResidentSpecialNeeds() {
                         Sakin ID: {selectedResident.residentId}
                       </div>
                     </div>
+                    {savedPriority && PRIORITY_CONFIG[savedPriority] && (
+                      <div className="sn-ucard-meta">
+                        <span
+                          style={{
+                            fontSize: 10,
+                            color: "var(--muted)",
+                            letterSpacing: ".8px",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Kayıtlı Öncelik
+                        </span>
+                        <span
+                          className="sn-priority-pill"
+                          style={{
+                            color: PRIORITY_CONFIG[savedPriority].color,
+                            borderColor: PRIORITY_CONFIG[savedPriority].border,
+                            background: PRIORITY_CONFIG[savedPriority].bg,
+                            fontSize: 12,
+                            padding: "3px 10px",
+                          }}
+                        >
+                          {PRIORITY_CONFIG[savedPriority].icon}{" "}
+                          {PRIORITY_CONFIG[savedPriority].label}
+                        </span>
+                      </div>
+                    )}
                   </div>
+
+                  {livePreviewPriority &&
+                    PRIORITY_CONFIG[livePreviewPriority] &&
+                    (() => {
+                      const cfg = PRIORITY_CONFIG[livePreviewPriority];
+                      return (
+                        <div
+                          className="sn-priority-preview"
+                          style={{
+                            background: cfg.bg,
+                            borderColor: cfg.border,
+                          }}
+                        >
+                          <div className="sn-priority-icon">{cfg.icon}</div>
+                          <div className="sn-priority-info">
+                            <div className="sn-priority-lbl">
+                              Öncelik Önizlemesi
+                            </div>
+                            <div
+                              className="sn-priority-val"
+                              style={{ color: cfg.color }}
+                            >
+                              {cfg.label}
+                            </div>
+                            <div className="sn-priority-desc">
+                              {PRIORITY_DESC[livePreviewPriority]}
+                            </div>
+                          </div>
+                          {priorityChanged && (
+                            <div className="sn-priority-change-badge">
+                              ↑ Değişecek
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                   <div>
                     <div className="sn-section-lbl">Özel İhtiyaçlar</div>
                     <div className="sn-needs-grid">
@@ -288,6 +472,7 @@ export default function ResidentSpecialNeeds() {
                       ))}
                     </div>
                   </div>
+
                   <button
                     className="sn-save-btn"
                     onClick={save}

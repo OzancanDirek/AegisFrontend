@@ -31,21 +31,29 @@ export default function Login() {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || data.message) {
         setError(
           data.message || "Giriş başarısız. Bilgilerinizi kontrol edin.",
         );
         return;
       }
 
-      if (data.token) {
-        localStorage.setItem("aegis_token", data.token);
+      if (data.accessToken) {
+        localStorage.setItem("aegis_token", data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem("aegis_refresh_token", data.refreshToken);
       }
       localStorage.setItem("email", email);
       if (data.name) localStorage.setItem("name", data.name);
       if (data.role) localStorage.setItem("role", data.role);
 
-      navigate("/adminDashboard");
+      const role = data.role;
+      if (role === "Admin") navigate("/adminDashboard");
+      else if (role === "WAREHOUSE_MANAGER") navigate("/warehouses");
+      else if (role === "Gonullu") navigate("/map");
+      else if (role === "Calisan") navigate("/adminDashboard");
+      else navigate("/map");
     } catch (err) {
       setError("Sunucuya bağlanılamadı. Lütfen tekrar deneyin. " + err.message);
     } finally {

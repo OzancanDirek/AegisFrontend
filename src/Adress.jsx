@@ -5,6 +5,9 @@ import Sidebar from "./sidebar";
 
 const API = "http://localhost:8080/api/addresses";
 
+// Token'ı her istekte otomatik ekleyen yardımcı fonksiyon
+import { authFetch } from "./authFetch";
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -281,9 +284,8 @@ export default function Addresses() {
     }
     setUpdating(true);
     try {
-      const res = await fetch(`${API}/${editModal.id}`, {
+      const res = await authFetch(`${API}/${editModal.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...editModal.form,
           latitude: editModal.form.latitude
@@ -310,7 +312,7 @@ export default function Addresses() {
 
   const loadAddresses = async () => {
     try {
-      const res = await fetch(`${API}/allAdresses`);
+      const res = await authFetch(`${API}/allAdresses`);
       const data = await res.json();
       setAddresses(Array.isArray(data) ? data : []);
     } catch {
@@ -331,9 +333,8 @@ export default function Addresses() {
     }
     setSaving(true);
     try {
-      const res = await fetch(API, {
+      const res = await authFetch(API, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
           latitude: form.latitude ? parseFloat(form.latitude) : null,
@@ -362,7 +363,7 @@ export default function Addresses() {
   const deleteAddress = async (id) => {
     if (!window.confirm("Bu adresi silmek istediğinize emin misiniz?")) return;
     try {
-      const res = await fetch(`${API}/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API}/${id}`, { method: "DELETE" });
       if (res.ok) {
         showToast("Adres silindi", "success");
         loadAddresses();
