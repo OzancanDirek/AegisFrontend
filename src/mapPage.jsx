@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import AegisLogo from "./images/Aegislogo.jpeg";
 import Sidebar from "./sidebar";
 
-
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,13 +13,11 @@ const CSS = `
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
-  .map-shell {
-    display: grid;
-    grid-template-rows: var(--header-h) 1fr var(--footer-h);
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-areas: "header header" "sidebar main" "footer footer";
-    height: 100vh; width: 100vw;
-  }
+  .map-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
+  .quake-pulse-wrap { position: relative; width: 36px; height: 36px; }
+  .quake-dot { width: 14px; height: 14px; border-radius: 50%; background: #ef4444; border: 2px solid #fff; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 2; }
+  .quake-ring { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ef4444; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: quakeRing 1.8s ease-out infinite; z-index: 1; }
+  @keyframes quakeRing { 0%{transform:translate(-50%,-50%) scale(.4);opacity:1} 100%{transform:translate(-50%,-50%) scale(1.8);opacity:0} }
   .al-header { grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px 0 0; position: sticky; top: 0; z-index: 1000; }
   .al-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px; width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
   .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
@@ -54,9 +51,12 @@ const CSS = `
   .mp-info { padding: 12px 14px; }
   .mp-info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
   .mp-info-city { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-  .mp-info-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+  .mp-info-row { display: flex; justify-content: space-between; font-size: 11px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .mp-info-row:last-child { border-bottom: none; }
   .mp-info-lbl { color: var(--muted); }
   .mp-info-val { color: var(--text); font-weight: 500; }
+  .mp-info-section { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 10px 0 4px; }
+  .mp-impact-row { display: flex; justify-content: space-between; font-size: 11px; padding: 5px 6px; border-radius: 6px; margin-bottom: 3px; background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.1); }
   .mp-empty-info { font-size: 12px; color: var(--muted); text-align: center; padding: 20px 14px; line-height: 1.6; }
   .map-container { flex: 1; position: relative; }
   #leaflet-map { width: 100%; height: 100%; }
@@ -92,8 +92,8 @@ const RISK_NAMES = {
   4: "Düşük",
   5: "Çok Düşük",
 };
+const IMPACT_RATE = { 1: 0.35, 2: 0.2, 3: 0.08, 4: 0.02, 5: 0.005 };
 
-// GeoJSON'daki "name" alanına göre eşleşme (simplemaps İngilizce isim kullanır)
 const RISK_DATA = {
   Istanbul: {
     name: "İstanbul",
@@ -606,7 +606,6 @@ const LogoutIcon = () => (
   </svg>
 );
 
-// GeoJSON'daki name değerini RISK_DATA key'ine normalize et
 function normalizeKey(name = "") {
   return name
     .replace(/İ/g, "I")
@@ -625,12 +624,35 @@ function normalizeKey(name = "") {
     .replace(/[^a-zA-Z]/g, "");
 }
 
+function parsePopNum(popStr = "") {
+  const n = parseFloat(popStr);
+  if (popStr.includes("M")) return Math.round(n * 1_000_000);
+  if (popStr.includes("K")) return Math.round(n * 1_000);
+  return n;
+}
+
+function calcImpact(popStr, risk) {
+  const pop = parsePopNum(popStr);
+  const rate = IMPACT_RATE[risk] || 0.08;
+  const affected = Math.round(pop * rate);
+  const volunteers = Math.round(affected / 300);
+  const shelters = Math.round(affected / 200);
+  return { affected, volunteers, shelters };
+}
+
+function formatNum(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return Math.round(n / 1_000) + "K";
+  return String(n);
+}
+
 export default function MapPage() {
   const navigate = useNavigate();
   const mapRef = useRef(null);
   const leafletRef = useRef(null);
   const geoLayersRef = useRef([]);
   const filterRef = useRef("all");
+  const quakeMarkerRef = useRef(null);
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedCity, setSelectedCity] = useState(null);
@@ -641,13 +663,10 @@ export default function MapPage() {
   const [lastQuake, setLastQuake] = useState("Yükleniyor...");
 
   const userName = localStorage.getItem("name") || "Admin";
-
   const getColor = (risk) => RISK_COLORS[risk] || "#6b8099";
 
   const lookupByName = (rawName = "") => {
-    // Önce direkt eşleşme dene
     if (RISK_DATA[rawName]) return RISK_DATA[rawName];
-    // Normalize ederek dene
     const norm = normalizeKey(rawName);
     const found = Object.entries(RISK_DATA).find(
       ([k]) => normalizeKey(k) === norm,
@@ -674,22 +693,50 @@ export default function MapPage() {
   };
 
   useEffect(() => {
-    fetch("https://api.orhanaydogdu.com.tr/deprem/kandilli/live")
-      .then((r) => r.json())
-      .then((data) => {
-        const eq = data.result?.[0];
-        if (eq) {
-          const mag = Number(eq.mag).toFixed(1);
-          const location = eq.title
-            ?.split("-")
-            .pop()
-            ?.trim()
-            ?.replace(/\(.*?\)/g, "")
-            ?.trim();
-          setLastQuake(mag + " — " + location);
-        }
-      })
-      .catch(() => setLastQuake("Veri alınamadı"));
+    const fetchQuake = () => {
+      fetch("https://api.orhanaydogdu.com.tr/deprem/kandilli/live")
+        .then((r) => r.json())
+        .then((data) => {
+          const eq = data.result?.[0];
+          if (eq) {
+            const mag = Number(eq.mag).toFixed(1);
+            const location = eq.title
+              ?.split("-")
+              .pop()
+              ?.trim()
+              ?.replace(/\(.*?\)/g, "")
+              ?.trim();
+            setLastQuake(mag + " — " + location);
+            const lng = eq.geojson?.coordinates?.[0];
+            const lat = eq.geojson?.coordinates?.[1];
+            if (lat && lng && leafletRef.current) {
+              if (quakeMarkerRef.current) quakeMarkerRef.current.remove();
+              const L = window.L;
+              const icon = L.divIcon({
+                html: `<div class="quake-pulse-wrap"><div class="quake-ring"></div><div class="quake-dot"></div></div>`,
+                className: "",
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+              });
+              quakeMarkerRef.current = L.marker([lat, lng], { icon })
+                .addTo(leafletRef.current)
+                .bindTooltip(
+                  `<div style="background:#161d27;border:1px solid #ef4444;border-radius:6px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:12px;color:#e8f0fe">
+                    <b style="color:#ef4444">🔴 Son Deprem</b><br>
+                    <b>${eq.title}</b><br>
+                    Büyüklük: <b style="color:#ef4444">${mag}</b><br>
+                    Derinlik: ${eq.depth} km
+                  </div>`,
+                  { sticky: true, className: "leaflet-tooltip" },
+                );
+            }
+          }
+        })
+        .catch(() => setLastQuake("Veri alınamadı"));
+    };
+    fetchQuake();
+    const interval = setInterval(fetchQuake, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -703,7 +750,6 @@ export default function MapPage() {
           document.head.appendChild(s);
         });
       }
-
       const L = window.L;
       if (leafletRef.current) return;
       if (!mapRef.current) return;
@@ -714,23 +760,17 @@ export default function MapPage() {
         zoomControl: true,
         attributionControl: false,
       });
-
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        {
-          maxZoom: 12,
-        },
+        { maxZoom: 12 },
       ).addTo(map);
-
       leafletRef.current = map;
 
-      // Projenizin public/ klasöründeki WGS84 GeoJSON dosyasını yükle
       try {
         const res = await fetch("/tr-cities.json");
         if (!res.ok) throw new Error("GeoJSON dosyası bulunamadı");
         const data = await res.json();
 
-        // Debug: ilk 5 feature'ın name'ini logla
         const sampleKeys = data.features.slice(0, 5).map((f) => {
           const p = f.properties;
           return (
@@ -766,9 +806,7 @@ export default function MapPage() {
             const info = lookupByName(rawName);
             const risk = info?.risk ?? 3;
             const displayName = info?.name || rawName;
-
             geoLayersRef.current.push({ layer, feat });
-
             layer.on("mouseover", function () {
               this.setStyle({ weight: 2, fillOpacity: 0.92 });
             });
@@ -778,7 +816,6 @@ export default function MapPage() {
             layer.on("click", function () {
               if (info) setSelectedCity({ name: displayName, ...info });
             });
-
             if (displayName) {
               layer.bindTooltip(
                 `<div style="background:#161d27;border:1px solid #253045;border-radius:6px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:12px;color:#e8f0fe">
@@ -790,7 +827,6 @@ export default function MapPage() {
             }
           },
         }).addTo(map);
-
         setLoading(false);
       } catch (err) {
         console.error("Map error:", err);
@@ -804,7 +840,6 @@ export default function MapPage() {
       setMapError(true);
       setLoading(false);
     });
-
     return () => {
       if (leafletRef.current) {
         leafletRef.current.remove();
@@ -816,9 +851,9 @@ export default function MapPage() {
 
   useEffect(() => {
     filterRef.current = activeFilter;
-    geoLayersRef.current.forEach(({ layer, feat }) => {
-      layer.setStyle(buildStyle(feat, activeFilter));
-    });
+    geoLayersRef.current.forEach(({ layer, feat }) =>
+      layer.setStyle(buildStyle(feat, activeFilter)),
+    );
   }, [activeFilter]);
 
   const highRiskCount = (counts[1] || 0) + (counts[2] || 0);
@@ -924,6 +959,7 @@ export default function MapPage() {
                 <span className="mp-stat-val">{lastQuake}</span>
               </div>
             </div>
+
             <div className="mp-info">
               {selectedCity ? (
                 <div className="mp-info-card">
@@ -960,6 +996,45 @@ export default function MapPage() {
                       {selectedCity.req} talep
                     </span>
                   </div>
+
+                  {/* ETKİ ANALİZİ */}
+                  <div className="mp-info-section">Tahmini Etki Analizi</div>
+                  {(() => {
+                    const { affected, volunteers, shelters } = calcImpact(
+                      selectedCity.pop,
+                      selectedCity.risk,
+                    );
+                    return (
+                      <>
+                        <div className="mp-impact-row">
+                          <span className="mp-info-lbl">Etkilenecek Kişi</span>
+                          <span
+                            style={{
+                              color: RISK_COLORS[selectedCity.risk],
+                              fontWeight: 700,
+                              fontSize: 12,
+                            }}
+                          >
+                            ~{formatNum(affected)}
+                          </span>
+                        </div>
+                        <div className="mp-info-row">
+                          <span className="mp-info-lbl">Gönüllü İhtiyacı</span>
+                          <span className="mp-info-val">
+                            ~{formatNum(volunteers)}
+                          </span>
+                        </div>
+                        <div className="mp-info-row">
+                          <span className="mp-info-lbl">
+                            Muhtemel Barınak İhtiyacı
+                          </span>
+                          <span className="mp-info-val">
+                            ~{formatNum(shelters)}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               ) : (
                 <p className="mp-empty-info">

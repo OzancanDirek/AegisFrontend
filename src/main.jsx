@@ -17,13 +17,14 @@ import Addresses from "./Adress.jsx";
 import MapPage from "./mapPage.jsx";
 import Teams from "./Teams.jsx";
 import Warehouses from "./warehouse.jsx";
+import Announcements from "./announcements.jsx";
+import Home from "./home.jsx";
+import Requests from "./requests.jsx";
 
-// Her axios isteğine otomatik token ekle
+
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("aegis_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -31,12 +32,10 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* Public routes — herkes erişebilir */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/map" element={<MapPage />} />
 
-        {/* Admin only */}
         <Route
           path="/adminDashboard"
           element={
@@ -101,8 +100,6 @@ createRoot(document.getElementById("root")).render(
             </PrivateRoute>
           }
         />
-
-        {/* Warehouse Manager + Admin */}
         <Route
           path="/warehouses"
           element={
@@ -111,8 +108,6 @@ createRoot(document.getElementById("root")).render(
             </PrivateRoute>
           }
         />
-
-        {/* Gönüllü — kendi takımı */}
         <Route
           path="/my-team"
           element={
@@ -121,8 +116,59 @@ createRoot(document.getElementById("root")).render(
             </PrivateRoute>
           }
         />
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Admin",
+                "Calisan",
+                "Gonullu",
+                "Depremzede",
+                "WAREHOUSE_MANAGER",
+                "User",
+              ]}
+            >
+              <Home />
+            </PrivateRoute>
+          }
+        />
 
-        {/* Ana sayfa → role göre yönlendir */}
+        <Route
+          path="/requests"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Admin",
+                "Calisan",
+                "Gonullu",
+                "Depremzede",
+                "WAREHOUSE_MANAGER",
+              ]}
+            >
+              <Requests />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/announcements"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Admin",
+                "Calisan",
+                "Gonullu",
+                "Depremzede",
+                "WAREHOUSE_MANAGER",
+                "User",
+              ]}
+            >
+              <Announcements />
+            </PrivateRoute>
+          }
+        />
+
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

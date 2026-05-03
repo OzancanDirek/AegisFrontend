@@ -1,35 +1,15 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AegisLogo from "./images/Aegislogo.jpeg";
-import Sidebar from "./sidebar";
 import { authFetch } from "./authFetch";
+import Sidebar from "./sidebar";
+import Header from "./Header.jsx";
 
-const ShieldIcon = () => (
-  <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-);
-const UserIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="8" r="4" fill="currentColor" />
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="currentColor" />
-  </svg>
-);
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+const SearchIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
     <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
+      d="M21 21l-4-4"
       stroke="currentColor"
       strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-const PlusIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M12 5v14M5 12h14"
-      stroke="currentColor"
-      strokeWidth="2.5"
       strokeLinecap="round"
     />
   </svg>
@@ -47,6 +27,16 @@ const RefreshIcon = () => (
       d="M4 10A8 8 0 1 1 6 17"
       stroke="currentColor"
       strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+const PlusIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12 5v14M5 12h14"
+      stroke="currentColor"
+      strokeWidth="2.5"
       strokeLinecap="round"
     />
   </svg>
@@ -69,17 +59,6 @@ const TrashIcon = () => (
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-  </svg>
-);
-const SearchIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-    <path
-      d="M21 21l-4-4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
     />
   </svg>
 );
@@ -114,16 +93,6 @@ const CSS = `
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
   .al-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
-  .al-header { grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px 0 0; position: sticky; top: 0; z-index: 100; }
-  .al-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px; width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
-  .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  .al-header-right { display: flex; align-items: center; gap: 10px; }
-  .al-user-chip { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 40px; padding: 5px 14px 5px 5px; }
-  .al-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(245,166,35,0.18); border: 1px solid rgba(245,166,35,0.35); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
-  .al-user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .al-logout-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--font-body); font-size: 13px; padding: 7px 14px; cursor: pointer; transition: all .2s; }
-  .al-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
   .al-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
   .al-footer-l { font-size: 12px; color: var(--muted); }
@@ -159,9 +128,9 @@ const CSS = `
   .dash-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 14px; }
   .dash-error { background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.2); border-radius: var(--radius); padding: 16px 20px; color: var(--accent2); font-size: 14px; margin-bottom: 16px; }
   .wh-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
-  .wh-status.ACTIVE { background: rgba(62,207,90,.1); color: #3ecf5a; }
-  .wh-status.INACTIVE { background: rgba(107,128,153,.1); color: var(--muted); }
-  .wh-status.FULL { background: rgba(245,166,35,.1); color: var(--accent2); }
+  .wh-status.ACTIVE   { background: rgba(62,207,90,.1);    color: #3ecf5a; }
+  .wh-status.INACTIVE { background: rgba(107,128,153,.1);  color: var(--muted); }
+  .wh-status.FULL     { background: rgba(245,166,35,.1);   color: var(--accent2); }
   .wh-delete-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); font-family: var(--font-body); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .2s; }
   .wh-delete-btn:hover { border-color: #e05c5c; color: #e05c5c; }
   .wh-edit-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); font-family: var(--font-body); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .2s; margin-right: 6px; }
@@ -202,7 +171,6 @@ const EMPTY_FORM = {
 };
 
 export default function Warehouses() {
-  const navigate = useNavigate();
   const [warehouses, setWarehouses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -214,13 +182,7 @@ export default function Warehouses() {
   const [editModal, setEditModal] = useState(false);
   const [editForm, setEditForm] = useState(null);
 
-  const userName = localStorage.getItem("name") || "Admin";
   const adminEmail = localStorage.getItem("email") || "";
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
 
   const fetchAll = async () => {
     setLoading(true);
@@ -255,10 +217,6 @@ export default function Warehouses() {
     fetchUsers();
   }, []);
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
 
   const openModal = () => {
     setForm(EMPTY_FORM);
@@ -352,11 +310,9 @@ export default function Warehouses() {
       const res = await authFetch(`http://localhost:8080/api/warehouse/${id}`, {
         method: "DELETE",
       });
-      if (res.ok) {
+      if (res.ok)
         setWarehouses((prev) => prev.filter((w) => w.warehouseId !== id));
-      } else {
-        setMessage("Depo silinemedi.");
-      }
+      else setMessage("Depo silinemedi.");
     } catch {
       setMessage("Depo silinemedi.");
     }
@@ -380,30 +336,84 @@ export default function Warehouses() {
     0,
   );
 
+  const ModalFields = ({ f, setF }) => (
+    <>
+      <div className="modal-body">
+        <div className="modal-field full">
+          <label className="modal-label">Depo Adı *</label>
+          <input
+            className="modal-input"
+            placeholder="örn. Merkez Depo"
+            value={f.name}
+            onChange={(e) => setF((p) => ({ ...p, name: e.target.value }))}
+          />
+        </div>
+        <div className="modal-row">
+          <div className="modal-field">
+            <label className="modal-label">Yönetici</label>
+            <select
+              className="modal-input"
+              value={f.managerId}
+              onChange={(e) =>
+                setF((p) => ({ ...p, managerId: e.target.value }))
+              }
+            >
+              <option value="">— Seçiniz —</option>
+              {userList.map((u) => (
+                <option key={u.userId} value={u.userId}>
+                  {u.name} {u.surname}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="modal-field">
+            <label className="modal-label">Durum</label>
+            <select
+              className="modal-input"
+              value={f.status}
+              onChange={(e) => setF((p) => ({ ...p, status: e.target.value }))}
+            >
+              <option value="ACTIVE">Aktif</option>
+              <option value="INACTIVE">Pasif</option>
+              <option value="FULL">Dolu</option>
+            </select>
+          </div>
+        </div>
+        <div className="modal-row">
+          <div className="modal-field">
+            <label className="modal-label">Kapasite (m³)</label>
+            <input
+              className="modal-input"
+              type="number"
+              placeholder="örn. 500"
+              value={f.capacityM3}
+              onChange={(e) =>
+                setF((p) => ({ ...p, capacityM3: e.target.value }))
+              }
+            />
+          </div>
+          <div className="modal-field">
+            <label className="modal-label">Adres ID</label>
+            <input
+              className="modal-input"
+              type="number"
+              placeholder="örn. 12"
+              value={f.addressId}
+              onChange={(e) =>
+                setF((p) => ({ ...p, addressId: e.target.value }))
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <>
       <style>{CSS}</style>
       <div className="al-shell">
-        <header className="al-header">
-          <div className="al-logo">
-            <ShieldIcon />
-            <span className="al-logo-text">
-              Aegis<span>.</span>
-            </span>
-          </div>
-          <div className="al-header-right">
-            <div className="al-user-chip">
-              <div className="al-avatar">
-                <UserIcon />
-              </div>
-              <span className="al-user-name">{userName}</span>
-            </div>
-            <button className="al-logout-btn" onClick={handleLogout}>
-              <LogoutIcon /> Çıkış Yap
-            </button>
-          </div>
-        </header>
-
+        <Header />
         <Sidebar />
 
         <main className="al-main">
@@ -564,73 +574,7 @@ export default function Warehouses() {
                 <CloseIcon />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="modal-field full">
-                <label className="modal-label">Depo Adı *</label>
-                <input
-                  className="modal-input"
-                  name="name"
-                  placeholder="örn. Merkez Depo"
-                  value={form.name}
-                  onChange={handleFormChange}
-                />
-              </div>
-              <div className="modal-row">
-                <div className="modal-field">
-                  <label className="modal-label">Yönetici</label>
-                  <select
-                    className="modal-input"
-                    name="managerId"
-                    value={form.managerId}
-                    onChange={handleFormChange}
-                  >
-                    <option value="">— Seçiniz —</option>
-                    {userList.map((u) => (
-                      <option key={u.userId} value={u.userId}>
-                        {u.name} {u.surname}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="modal-field">
-                  <label className="modal-label">Durum</label>
-                  <select
-                    className="modal-input"
-                    name="status"
-                    value={form.status}
-                    onChange={handleFormChange}
-                  >
-                    <option value="ACTIVE">Aktif</option>
-                    <option value="INACTIVE">Pasif</option>
-                    <option value="FULL">Dolu</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-row">
-                <div className="modal-field">
-                  <label className="modal-label">Kapasite (m³)</label>
-                  <input
-                    className="modal-input"
-                    name="capacityM3"
-                    type="number"
-                    placeholder="örn. 500"
-                    value={form.capacityM3}
-                    onChange={handleFormChange}
-                  />
-                </div>
-                <div className="modal-field">
-                  <label className="modal-label">Adres ID</label>
-                  <input
-                    className="modal-input"
-                    name="addressId"
-                    type="number"
-                    placeholder="örn. 12"
-                    value={form.addressId}
-                    onChange={handleFormChange}
-                  />
-                </div>
-              </div>
-            </div>
+            <ModalFields f={form} setF={setForm} />
             <div className="modal-foot">
               <button
                 className="modal-cancel"
@@ -670,78 +614,7 @@ export default function Warehouses() {
                 <CloseIcon />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="modal-field full">
-                <label className="modal-label">Depo Adı *</label>
-                <input
-                  className="modal-input"
-                  placeholder="örn. Merkez Depo"
-                  value={editForm.name}
-                  onChange={(e) =>
-                    setEditForm((p) => ({ ...p, name: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="modal-row">
-                <div className="modal-field">
-                  <label className="modal-label">Yönetici</label>
-                  <select
-                    className="modal-input"
-                    value={editForm.managerId}
-                    onChange={(e) =>
-                      setEditForm((p) => ({ ...p, managerId: e.target.value }))
-                    }
-                  >
-                    <option value="">— Seçiniz —</option>
-                    {userList.map((u) => (
-                      <option key={u.userId} value={u.userId}>
-                        {u.name} {u.surname}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="modal-field">
-                  <label className="modal-label">Durum</label>
-                  <select
-                    className="modal-input"
-                    value={editForm.status}
-                    onChange={(e) =>
-                      setEditForm((p) => ({ ...p, status: e.target.value }))
-                    }
-                  >
-                    <option value="ACTIVE">Aktif</option>
-                    <option value="INACTIVE">Pasif</option>
-                    <option value="FULL">Dolu</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-row">
-                <div className="modal-field">
-                  <label className="modal-label">Kapasite (m³)</label>
-                  <input
-                    className="modal-input"
-                    type="number"
-                    placeholder="örn. 500"
-                    value={editForm.capacityM3}
-                    onChange={(e) =>
-                      setEditForm((p) => ({ ...p, capacityM3: e.target.value }))
-                    }
-                  />
-                </div>
-                <div className="modal-field">
-                  <label className="modal-label">Adres ID</label>
-                  <input
-                    className="modal-input"
-                    type="number"
-                    placeholder="örn. 12"
-                    value={editForm.addressId}
-                    onChange={(e) =>
-                      setEditForm((p) => ({ ...p, addressId: e.target.value }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+            <ModalFields f={editForm} setF={setEditForm} />
             <div className="modal-foot">
               <button
                 className="modal-cancel"

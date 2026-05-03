@@ -49,11 +49,12 @@ export default function Login() {
       if (data.role) localStorage.setItem("role", data.role);
 
       const role = data.role;
-      if (role === "Admin") navigate("/adminDashboard");
-      else if (role === "WAREHOUSE_MANAGER") navigate("/warehouses");
-      else if (role === "Gonullu") navigate("/map");
-      else if (role === "Calisan") navigate("/adminDashboard");
-      else navigate("/map");
+      if (role === "Admin") navigate("/home");
+      else if (role === "Calisan") navigate("/home");
+      else if (role === "WAREHOUSE_MANAGER") navigate("/home");
+      else if (role === "Gonullu") navigate("/home");
+      else if (role === "Depremzede") navigate("/home");
+      else navigate("/home");
     } catch (err) {
       setError("Sunucuya bağlanılamadı. Lütfen tekrar deneyin. " + err.message);
     } finally {

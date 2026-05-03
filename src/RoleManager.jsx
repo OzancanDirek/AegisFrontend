@@ -1,35 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import AegisLogo from "./images/Aegislogo.jpeg";
+import { authFetch } from "./authFetch";
 import Sidebar from "./sidebar";
+import Header from "./Header.jsx";
 
 const API = "http://localhost:8080/api/UserRole";
-
-// Token'ı her istekte otomatik ekleyen yardımcı fonksiyon
-import { authFetch } from "./authFetch";
-
-const ShieldIcon = () => (
-  <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-);
-
-const UserIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="8" r="4" fill="currentColor" />
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="currentColor" />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 const roleColors = {
   ADMIN: { bg: "rgba(239,68,68,0.15)", border: "#ef4444", text: "#ef4444" },
@@ -69,7 +43,6 @@ const CSS = `
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
-
   .rm-shell {
     display: grid;
     grid-template-rows: var(--header-h) 1fr var(--footer-h);
@@ -77,178 +50,70 @@ const CSS = `
     grid-template-areas: "header header" "sidebar main" "footer footer";
     height: 100vh; width: 100vw;
   }
-
-  .al-header {
-    grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px 0 0; position: sticky; top: 0; z-index: 100;
-  }
-  .al-logo {
-    display: flex; align-items: center; gap: 10px; padding: 0 20px;
-    width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0;
-  }
-  .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  .al-header-right { display: flex; align-items: center; gap: 10px; }
-  .al-user-chip {
-    display: flex; align-items: center; gap: 8px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 40px; padding: 5px 14px 5px 5px;
-  }
-  .al-avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: rgba(245,166,35,0.18); border: 1px solid rgba(245,166,35,0.35);
-    display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0;
-  }
-  .al-user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .al-logout-btn {
-    display: flex; align-items: center; gap: 6px; background: transparent;
-    border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
-    font-family: var(--font-body); font-size: 13px; padding: 7px 14px; cursor: pointer; transition: all .2s;
-  }
-  .al-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
-
   .rm-main { grid-area: main; padding: 24px; overflow-y: auto; background: var(--bg); }
-
   .rm-toast {
     position: fixed; top: 18px; right: 22px; z-index: 9999;
     padding: 10px 18px; border-radius: var(--radius);
     font-family: var(--font-body); font-size: 13px; font-weight: 600;
     display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.5); border: 1px solid;
-    animation: rmSlide .2s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,.5); border: 1px solid; animation: rmSlide .2s ease;
   }
   .rm-toast.success { background: rgba(62,207,90,.1); border-color: #3ecf5a; color: #3ecf5a; }
   .rm-toast.error   { background: rgba(239,68,68,.1);  border-color: #ef4444; color: #ef4444; }
   @keyframes rmSlide { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-
   .rm-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100vh - var(--header-h) - var(--footer-h) - 48px); }
-
-  .rm-panel {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden;
-  }
-  .rm-panel-head {
-    padding: 13px 18px; border-bottom: 1px solid var(--border);
-    background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-  }
+  .rm-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
+  .rm-panel-head { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .rm-panel-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
-  .rm-panel-count {
-    background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25);
-    color: var(--accent); font-size: 11px; font-weight: 700;
-    padding: 2px 8px; border-radius: 20px; font-family: var(--font-body);
-  }
-
+  .rm-panel-count { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25); color: var(--accent); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: var(--font-body); }
   .rm-search-wrap { padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .rm-search {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); padding: 8px 12px;
-    font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s;
-  }
+  .rm-search { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s; }
   .rm-search:focus { border-color: rgba(245,166,35,.5); }
   .rm-search::placeholder { color: var(--muted); }
-
   .rm-user-list { overflow-y: auto; flex: 1; }
-  .rm-user-btn {
-    width: 100%; display: flex; align-items: center; gap: 11px;
-    padding: 11px 14px; background: transparent; border: none;
-    border-bottom: 1px solid var(--border); color: var(--muted);
-    cursor: pointer; text-align: left; transition: background .12s; font-family: var(--font-body);
-  }
+  .rm-user-btn { width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--muted); cursor: pointer; text-align: left; transition: background .12s; font-family: var(--font-body); }
   .rm-user-btn:hover { background: var(--surface2); color: var(--text); }
   .rm-user-btn.active { background: rgba(245,166,35,.07); }
-  .rm-avatar {
-    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
-  }
+  .rm-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
   .rm-user-btn.active .rm-avatar { background: rgba(245,166,35,.18); border-color: rgba(245,166,35,.4); color: var(--accent); }
   .rm-uinfo { flex: 1; display: flex; flex-direction: column; gap: 1px; }
   .rm-uname { font-size: 13px; font-weight: 500; color: var(--text); }
   .rm-uid   { font-size: 11px; color: var(--muted); }
   .rm-active-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-
   .rm-empty { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
-  .rm-empty-state {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 12px; padding: 40px;
-  }
-  .rm-empty-icon {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; font-size: 20px;
-  }
+  .rm-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; }
+  .rm-empty-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; }
   .rm-empty-txt { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
-
   .rm-assign-area { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
-
-  .rm-ucard {
-    display: flex; align-items: center; gap: 12px; padding: 14px;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
-  }
-  .rm-ucard-avatar {
-    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; font-weight: 700;
-    background: rgba(245,166,35,.15); border: 1.5px solid rgba(245,166,35,.4); color: var(--accent);
-  }
+  .rm-ucard { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
+  .rm-ucard-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: rgba(245,166,35,.15); border: 1.5px solid rgba(245,166,35,.4); color: var(--accent); }
   .rm-ucard-name { font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--font-head); }
   .rm-ucard-id   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
   .rm-section { display: flex; flex-direction: column; gap: 8px; }
-  .rm-section-lbl {
-    font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--muted); font-weight: 600;
-  }
+  .rm-section-lbl { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
   .rm-role-tags { display: flex; flex-wrap: wrap; gap: 7px; }
-  .rm-role-tag {
-    padding: 4px 11px; border-radius: 20px; font-size: 12px;
-    font-weight: 600; border: 1px solid; font-family: var(--font-body);
-  }
+  .rm-role-tag { padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid; font-family: var(--font-body); }
   .rm-no-role { font-size: 12px; color: var(--muted); font-style: italic; }
-
   .rm-role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .rm-role-card {
-    padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);
-    background: var(--bg); cursor: pointer; transition: all .15s;
-    display: flex; flex-direction: column; gap: 5px; position: relative;
-  }
+  .rm-role-card { padding: 14px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); cursor: pointer; transition: all .15s; display: flex; flex-direction: column; gap: 5px; position: relative; }
   .rm-role-card:hover { border-color: rgba(245,166,35,.4); background: rgba(245,166,35,.04); }
   .rm-role-card.chosen { border-color: var(--accent); background: rgba(245,166,35,.09); }
   .rm-rc-dot { width: 8px; height: 8px; border-radius: 50%; margin-bottom: 2px; }
   .rm-rc-name { font-size: 13px; font-weight: 700; font-family: var(--font-head); color: var(--muted); }
   .rm-role-card.chosen .rm-rc-name { color: var(--accent); }
-  .rm-rc-check {
-    position: absolute; top: 10px; right: 10px;
-    width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; color: #0d1117; font-weight: 900;
-  }
-
-  .rm-assign-btn {
-    width: 100%; padding: 12px; border-radius: var(--radius); border: none;
-    background: var(--accent); color: #0d1117;
-    font-size: 13px; font-weight: 700; font-family: var(--font-head);
-    cursor: pointer; transition: background .15s, opacity .15s; margin-top: auto;
-  }
+  .rm-rc-check { position: absolute; top: 10px; right: 10px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #0d1117; font-weight: 900; }
+  .rm-assign-btn { width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--accent); color: #0d1117; font-size: 13px; font-weight: 700; font-family: var(--font-head); cursor: pointer; transition: background .15s, opacity .15s; margin-top: auto; }
   .rm-assign-btn:hover:not(:disabled) { background: var(--accent2); }
   .rm-assign-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-  .al-footer {
-    grid-area: footer; background: var(--surface); border-top: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
-  }
+  .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
   .al-footer-l { font-size: 12px; color: var(--muted); }
   .al-footer-l strong { color: var(--accent); }
   .al-footer-r { font-size: 12px; color: var(--muted); }
-  .al-dot {
-    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-    background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite;
-  }
+  .al-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 `;
 
 export default function RoleManager() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -258,11 +123,9 @@ export default function RoleManager() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
 
-  const userName = localStorage.getItem("name") || "Admin";
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+  const showToast = (msg, type = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3200);
   };
 
   useEffect(() => {
@@ -312,11 +175,6 @@ export default function RoleManager() {
     }
   };
 
-  const showToast = (msg, type = "success") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3200);
-  };
-
   const filteredUsers = users.filter((u) =>
     getDisplayName(u).toLowerCase().includes(search.toLowerCase()),
   );
@@ -324,7 +182,6 @@ export default function RoleManager() {
   return (
     <>
       <style>{CSS}</style>
-
       {toast && (
         <div className={`rm-toast ${toast.type}`}>
           {toast.type === "success" ? "✓" : "✕"} {toast.msg}
@@ -332,34 +189,11 @@ export default function RoleManager() {
       )}
 
       <div className="rm-shell">
-        {/* ── HEADER ── */}
-        <header className="al-header">
-          <div className="al-logo">
-            <ShieldIcon />
-            <span className="al-logo-text">
-              Aegis<span>.</span>
-            </span>
-          </div>
-          <div className="al-header-right">
-            <div className="al-user-chip">
-              <div className="al-avatar">
-                <UserIcon />
-              </div>
-              <span className="al-user-name">{userName}</span>
-            </div>
-            <button className="al-logout-btn" onClick={handleLogout}>
-              <LogoutIcon /> Çıkış Yap
-            </button>
-          </div>
-        </header>
-
-        {/* ── SIDEBAR ── */}
+        <Header />
         <Sidebar />
 
-        {/* ── MAIN ── */}
         <main className="rm-main">
           <div className="rm-content">
-            {/* LEFT: USER LIST */}
             <div className="rm-panel">
               <div className="rm-panel-head">
                 <span className="rm-panel-title">Kullanıcılar</span>
@@ -404,7 +238,6 @@ export default function RoleManager() {
               </div>
             </div>
 
-            {/* RIGHT: ROLE ASSIGNMENT */}
             <div className="rm-panel">
               <div className="rm-panel-head">
                 <span className="rm-panel-title">Rol Atama</span>
@@ -414,7 +247,6 @@ export default function RoleManager() {
                   </span>
                 )}
               </div>
-
               {!selected ? (
                 <div className="rm-empty-state">
                   <div className="rm-empty-icon">👤</div>
@@ -511,7 +343,6 @@ export default function RoleManager() {
           </div>
         </main>
 
-        {/* ── FOOTER ── */}
         <footer className="al-footer">
           <div className="al-footer-l">
             <span className="al-dot" />

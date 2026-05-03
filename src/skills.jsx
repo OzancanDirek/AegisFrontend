@@ -1,29 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import AegisLogo from "./images/Aegislogo.jpeg";
 import Sidebar from "./sidebar";
+import Header from "./Header.jsx";
 
-const ShieldIcon = () => (
-  <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-);
-const UserIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="8" r="4" fill="currentColor" />
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="currentColor" />
-  </svg>
-);
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 const PlusIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
     <path
@@ -63,41 +42,24 @@ const TrashIcon = () => (
   </svg>
 );
 
-const SKILLS_CSS = `
+const CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --bg: #0d1117; --surface: #161d27; --surface2: #1e2a3a;
     --border: #253045; --accent: #F5A623; --accent2: #ffc04a;
     --text: #e8f0fe; --muted: #6b8099;
+    --sidebar-w: 230px; --header-h: 60px; --footer-h: 48px; --radius: 10px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
-  
-  .al-shell { 
-    display: grid; 
-    grid-template-rows: 60px 1fr 48px; 
-    grid-template-columns: 230px 1fr; 
-    grid-template-areas: "header header" "sidebar main" "footer footer"; 
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
+  .al-shell {
+    display: grid;
+    grid-template-rows: var(--header-h) 1fr var(--footer-h);
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-areas: "header header" "sidebar main" "footer footer";
+    height: 100vh; width: 100vw; overflow: hidden;
   }
-  
-  .al-header { 
-    grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding-right: 20px; z-index: 100; 
-  }
-  
-  .al-logo { 
-    display: flex; align-items: center; gap: 10px; padding: 0 20px; 
-    width: 230px; border-right: 1px solid var(--border); height: 100%; 
-  }
-  
-  .al-logo-text { font-weight: 800; font-size: 20px; font-family: 'Syne', sans-serif; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  
   .al-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
-  
   .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
   .skill-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -105,23 +67,20 @@ const SKILLS_CSS = `
   }
   .skill-delete-btn { margin-left: auto; background: transparent; border: none; color: var(--muted); cursor: pointer; }
   .skill-delete-btn:hover { color: var(--accent); }
-  
-  .al-footer { 
-    grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 24px; font-size: 12px; color: var(--muted); 
+  .al-footer {
+    grid-area: footer; background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; font-size: 12px; color: var(--muted);
   }
+  .al-footer strong { color: var(--accent); }
 `;
 
 export default function Skills() {
-  const navigate = useNavigate();
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [newSkill, setNewSkill] = useState("");
-
-  const userName = localStorage.getItem("name") || "Admin";
 
   const fetchSkills = async () => {
     setLoading(true);
@@ -171,43 +130,9 @@ export default function Skills() {
 
   return (
     <>
-      <style>{SKILLS_CSS}</style>
+      <style>{CSS}</style>
       <div className="al-shell">
-        <header className="al-header">
-          <div className="al-logo">
-            <ShieldIcon />{" "}
-            <span className="al-logo-text">
-              Aegis<span>.</span>
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span
-              style={{ fontSize: "13px", fontWeight: 500, color: "#e8f0fe" }}
-            >
-              {userName}
-            </span>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                navigate("/login");
-              }}
-              style={{
-                background: "transparent",
-                border: "1px solid #253045",
-                color: "#6b8099",
-                padding: "6px 12px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-            >
-              <LogoutIcon /> Çıkış
-            </button>
-          </div>
-        </header>
-
+        <Header />
         <Sidebar />
 
         <main className="al-main">
@@ -270,6 +195,7 @@ export default function Skills() {
               }}
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               placeholder="Yeni yetenek ekle..."
             />
             <button
@@ -378,8 +304,7 @@ export default function Skills() {
 
         <footer className="al-footer">
           <div>
-            <strong style={{ color: "#F5A623" }}>Aegis</strong> Afet Yönetim
-            Sistemi &nbsp;·&nbsp; v1.0.0
+            <strong>Aegis</strong> Afet Yönetim Sistemi &nbsp;·&nbsp; v1.0.0
           </div>
           <div>©️ 2026 Aegis. Tüm hakları saklıdır.</div>
         </footer>

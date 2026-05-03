@@ -167,13 +167,42 @@ const InventoryIcon = () => (
     />
   </svg>
 );
+const BellIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+const HomeIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M3 12L12 3l9 9"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 10v9a1 1 0 001 1h4v-4h4v4h4a1 1 0 001-1v-9"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
-// Her rol için gösterilecek menü öğeleri
 const NAV_BY_ROLE = {
   Admin: [
     {
       section: "Genel",
       items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         {
           icon: <DashboardIcon />,
           label: "Dashboard",
@@ -184,6 +213,7 @@ const NAV_BY_ROLE = {
         { icon: <UsersIcon />, label: "Rol Yönetimi", path: "/admin/roles" },
         { icon: <SkillIcon />, label: "Yetenekler", path: "/skills" },
         { icon: <AddressIcon />, label: "Adresler", path: "/addresses" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
         {
           icon: <SpecialNeedsIcon />,
@@ -195,12 +225,7 @@ const NAV_BY_ROLE = {
     {
       section: "Operasyon",
       items: [
-        {
-          icon: <AlertIcon />,
-          label: "Talepler",
-          path: "/requests",
-          badge: "3",
-        },
+        { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
       ],
@@ -209,10 +234,12 @@ const NAV_BY_ROLE = {
 
   WAREHOUSE_MANAGER: [
     {
-      section: "Depo",
+      section: "Menü",
       items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         { icon: <BoxIcon />, label: "Depolarım", path: "/warehouses" },
         { icon: <InventoryIcon />, label: "Envanter", path: "/inventory" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
       ],
     },
   ],
@@ -221,9 +248,11 @@ const NAV_BY_ROLE = {
     {
       section: "Menü",
       items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <TeamIcon />, label: "Takımım", path: "/my-team" },
         { icon: <VolunteerIcon />, label: "Profilim", path: "/volunteers" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
       ],
     },
   ],
@@ -232,6 +261,7 @@ const NAV_BY_ROLE = {
     {
       section: "Menü",
       items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         {
           icon: <DashboardIcon />,
           label: "Dashboard",
@@ -240,6 +270,7 @@ const NAV_BY_ROLE = {
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
         { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
       ],
     },
   ],
@@ -248,8 +279,21 @@ const NAV_BY_ROLE = {
     {
       section: "Menü",
       items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <AlertIcon />, label: "Yardım Talebi", path: "/requests" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+      ],
+    },
+  ],
+
+  User: [
+    {
+      section: "Menü",
+      items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
       ],
     },
   ],
@@ -259,8 +303,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const role = localStorage.getItem("role") || "User";
-
-  const sections = NAV_BY_ROLE[role] || NAV_BY_ROLE["Depremzede"];
+  const sections = NAV_BY_ROLE[role] || NAV_BY_ROLE["User"];
 
   return (
     <>
@@ -276,46 +319,18 @@ export default function Sidebar() {
           overflow-y: auto; z-index: 90;
         }
         .al-nav-section { padding: 0 10px; margin-bottom: 6px; }
-        .al-nav-label {
-          font-size: 10px; font-weight: 600; letter-spacing: 1.6px;
-          text-transform: uppercase; color: #3a5068;
-          padding: 2px 10px 10px; font-family: 'DM Sans', sans-serif;
-        }
-        .al-nav-item {
-          display: flex; align-items: center; gap: 10px;
-          padding: 9px 12px; border-radius: 10px; cursor: pointer;
-          transition: all .15s; color: #6b8099; font-size: 13.5px;
-          margin-bottom: 1px; position: relative;
-          font-family: 'DM Sans', sans-serif;
-        }
+        .al-nav-label { font-size: 10px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: #3a5068; padding: 2px 10px 10px; font-family: 'DM Sans', sans-serif; }
+        .al-nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; cursor: pointer; transition: all .15s; color: #6b8099; font-size: 13.5px; margin-bottom: 1px; position: relative; font-family: 'DM Sans', sans-serif; }
         .al-nav-item:hover { background: #1e2a3a; color: #a8c0d6; }
         .al-nav-item.active { background: rgba(245,166,35,.12); color: #F5A623; }
-        .al-nav-item.active::before {
-          content: ''; position: absolute; left: 0; top: 20%; height: 60%;
-          width: 3px; background: #F5A623; border-radius: 0 3px 3px 0;
-        }
-        .al-badge {
-          margin-left: auto; background: #F5A623; color: #0d1117;
-          font-size: 10px; font-weight: 700; padding: 1px 6px;
-          border-radius: 20px; min-width: 20px; text-align: center;
-        }
+        .al-nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: #F5A623; border-radius: 0 3px 3px 0; }
+        .al-badge { margin-left: auto; background: #F5A623; color: #0d1117; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; min-width: 20px; text-align: center; }
         .al-divider { height: 1px; background: #253045; margin: 14px 14px; }
-        .al-role-chip {
-          margin: 0 12px 16px;
-          padding: 6px 12px;
-          border-radius: 8px;
-          background: rgba(245,166,35,.08);
-          border: 1px solid rgba(245,166,35,.2);
-          font-size: 11px; font-weight: 600;
-          color: #F5A623; font-family: 'DM Sans', sans-serif;
-          text-align: center; letter-spacing: .5px;
-        }
+        .al-role-chip { margin: 0 12px 16px; padding: 6px 12px; border-radius: 8px; background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.2); font-size: 11px; font-weight: 600; color: #F5A623; font-family: 'DM Sans', sans-serif; text-align: center; letter-spacing: .5px; }
       `}</style>
 
       <aside className="al-sidebar">
-        {/* Rol etiketi */}
         <div className="al-role-chip">{role}</div>
-
         {sections.map((sec, i) => (
           <div key={sec.section}>
             {i > 0 && <div className="al-divider" />}

@@ -1,26 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import AegisLogo from "./images/Aegislogo.jpeg";
 import Sidebar from "./sidebar";
-
-const ShieldIcon = () => (
-  <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-);
-
-const UserIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="8" r="4" fill="currentColor" />
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="currentColor" />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    />
-  </svg>
-);
+import Header from "./Header.jsx";
 
 const BoxIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
@@ -32,7 +12,12 @@ const BoxIcon = () => (
 const AlertIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
     <path d="M12 2L2 19h20L12 2z" fill="currentColor" opacity=".8" />
-    <path d="M12 9v4M12 16.5v.5" stroke="#0d1117" strokeWidth="1.8" strokeLinecap="round" />
+    <path
+      d="M12 9v4M12 16.5v.5"
+      stroke="#0d1117"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
@@ -41,7 +26,12 @@ const UsersIcon = () => (
     <circle cx="9" cy="7" r="4" fill="currentColor" />
     <path d="M2 21v-1a7 7 0 0114 0v1" fill="currentColor" opacity=".7" />
     <circle cx="19" cy="8" r="3" fill="currentColor" opacity=".5" />
-    <path d="M22 21v-1a5 5 0 00-4-4.9" stroke="currentColor" strokeWidth="1.5" opacity=".5" />
+    <path
+      d="M22 21v-1a5 5 0 00-4-4.9"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      opacity=".5"
+    />
   </svg>
 );
 
@@ -49,14 +39,9 @@ const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg:       #0d1117;
-    --surface:  #161d27;
-    --surface2: #1e2a3a;
-    --border:   #253045;
-    --accent:   #F5A623;
-    --accent2:  #ffc04a;
-    --text:     #e8f0fe;
-    --muted:    #6b8099;
+    --bg: #0d1117; --surface: #161d27; --surface2: #1e2a3a;
+    --border: #253045; --accent: #F5A623; --accent2: #ffc04a;
+    --text: #e8f0fe; --muted: #6b8099;
     --sidebar-w: 230px; --header-h: 60px; --footer-h: 48px; --radius: 10px;
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
@@ -68,36 +53,6 @@ const CSS = `
     grid-template-areas: "header header" "sidebar main" "footer footer";
     height: 100vh; width: 100vw;
   }
-  .al-header {
-    grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px 0 0; position: sticky; top: 0; z-index: 100;
-  }
-  .al-logo {
-    display: flex; align-items: center; gap: 10px; padding: 0 20px;
-    width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0;
-  }
-  .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  .al-header-right { display: flex; align-items: center; gap: 10px; }
-  .al-user-chip {
-    display: flex; align-items: center; gap: 8px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 40px; padding: 5px 14px 5px 5px;
-  }
-  .al-avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: rgba(245,166,35,0.18); border: 1px solid rgba(245,166,35,0.35);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent); flex-shrink: 0;
-  }
-  .al-user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .al-logout-btn {
-    display: flex; align-items: center; gap: 6px; background: transparent;
-    border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
-    font-family: var(--font-body); font-size: 13px; padding: 7px 14px; cursor: pointer; transition: all .2s;
-  }
-  .al-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
-
   .al-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
   .al-footer {
     grid-area: footer; background: var(--surface); border-top: 1px solid var(--border);
@@ -111,7 +66,6 @@ const CSS = `
     background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite;
   }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
   .welcome-wrap { display: flex; flex-direction: column; gap: 24px; }
   .welcome-hero {
     background: var(--surface); border: 1px solid var(--border);
@@ -152,39 +106,33 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const userName = localStorage.getItem("name") || "Admin";
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   const CARDS = [
-    { icon: <UsersIcon />, title: "Kullanıcılar", desc: "Tüm kullanıcıları yönet",       path: "/adminUsers" },
-    { icon: <AlertIcon />, title: "Talepler",     desc: "Yardım taleplerini görüntüle",  path: "/requests" },
-    { icon: <BoxIcon />,   title: "Depolar",      desc: "Stok ve depo yönetimi",         path: "/warehouses" },
+    {
+      icon: <UsersIcon />,
+      title: "Kullanıcılar",
+      desc: "Tüm kullanıcıları yönet",
+      path: "/adminUsers",
+    },
+    {
+      icon: <AlertIcon />,
+      title: "Talepler",
+      desc: "Yardım taleplerini görüntüle",
+      path: "/requests",
+    },
+    {
+      icon: <BoxIcon />,
+      title: "Depolar",
+      desc: "Stok ve depo yönetimi",
+      path: "/warehouses",
+    },
   ];
 
   return (
     <>
       <style>{CSS}</style>
       <div className="al-shell">
-        <header className="al-header">
-          <div className="al-logo">
-            <ShieldIcon />
-            <span className="al-logo-text">Aegis<span>.</span></span>
-          </div>
-          <div className="al-header-right">
-            <div className="al-user-chip">
-              <div className="al-avatar"><UserIcon /></div>
-              <span className="al-user-name">{userName}</span>
-            </div>
-            <button className="al-logout-btn" onClick={handleLogout}>
-              <LogoutIcon /> Çıkış Yap
-            </button>
-          </div>
-        </header>
-
+        <Header />
         <Sidebar />
-
         <main className="al-main">
           <div className="welcome-wrap">
             <div className="welcome-hero">
@@ -193,12 +141,17 @@ export default function AdminDashboard() {
               </div>
               <p className="welcome-sub">
                 Aegis Afet Yönetim Sistemi'ne hoş geldiniz. Sol menüden yönetmek
-                istediğiniz bölümü seçebilir ya da aşağıdaki kartlardan hızlıca erişebilirsiniz.
+                istediğiniz bölümü seçebilir ya da aşağıdaki kartlardan hızlıca
+                erişebilirsiniz.
               </p>
             </div>
             <div className="welcome-cards">
               {CARDS.map((card) => (
-                <div className="welcome-card" key={card.path} onClick={() => navigate(card.path)}>
+                <div
+                  className="welcome-card"
+                  key={card.path}
+                  onClick={() => navigate(card.path)}
+                >
                   <div className="welcome-card-icon">{card.icon}</div>
                   <div className="welcome-card-title">{card.title}</div>
                   <div className="welcome-card-desc">{card.desc}</div>
@@ -207,13 +160,14 @@ export default function AdminDashboard() {
             </div>
           </div>
         </main>
-
         <footer className="al-footer">
           <div className="al-footer-l">
             <span className="al-dot" />
             <strong>Aegis</strong> Afet Yönetim Sistemi &nbsp;·&nbsp; v1.0.0
           </div>
-          <div className="al-footer-r">©️ 2026 Aegis. Tüm hakları saklıdır.</div>
+          <div className="al-footer-r">
+            ©️ 2026 Aegis. Tüm hakları saklıdır.
+          </div>
         </footer>
       </div>
     </>

@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AegisLogo from "./images/Aegislogo.jpeg";
+import { authFetch } from "./authFetch";
 import Sidebar from "./sidebar";
+import Header from "./Header.jsx";
 
 const API = "http://localhost:8080/api";
-
-import { authFetch } from "./authFetch";
-
 
 const TEAM_TYPE_CONFIG = {
   ARAMA_KURTARMA: {
@@ -67,53 +64,6 @@ const STATUS_CONFIG = {
   },
 };
 
-function TeamModal({
-  title,
-  accent,
-  onClose,
-  onConfirm,
-  confirmLabel,
-  loading,
-  children,
-}) {
-  return (
-    <div
-      className="tm-overlay"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="tm-modal">
-        <div className="tm-modal-title">
-          {title} <span style={{ color: "var(--accent)" }}>{accent}</span>
-        </div>
-        {children}
-        <div className="tm-modal-actions">
-          <button className="tm-cancel-btn" onClick={onClose}>
-            İptal
-          </button>
-          <button
-            className="tm-confirm-btn"
-            onClick={onConfirm}
-            disabled={loading}
-          >
-            {loading ? "İşleniyor..." : confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 const PlusIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
     <path
@@ -161,6 +111,42 @@ const TrashIcon = () => (
   </svg>
 );
 
+function TeamModal({
+  title,
+  accent,
+  onClose,
+  onConfirm,
+  confirmLabel,
+  loading,
+  children,
+}) {
+  return (
+    <div
+      className="tm-overlay"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="tm-modal">
+        <div className="tm-modal-title">
+          {title} <span style={{ color: "var(--accent)" }}>{accent}</span>
+        </div>
+        {children}
+        <div className="tm-modal-actions">
+          <button className="tm-cancel-btn" onClick={onClose}>
+            İptal
+          </button>
+          <button
+            className="tm-confirm-btn"
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? "İşleniyor..." : confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -171,34 +157,18 @@ const CSS = `
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
-
   .tm-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
-
-  .al-header { grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px 0 0; position: sticky; top: 0; z-index: 100; }
-  .al-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px; width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
-  .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  .al-header-right { display: flex; align-items: center; gap: 10px; }
-  .al-user-chip { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 40px; padding: 5px 14px 5px 5px; }
-  .al-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(245,166,35,0.18); border: 1px solid rgba(245,166,35,0.35); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; font-size: 13px; font-weight: 700; }
-  .al-user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .al-logout-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--font-body); font-size: 13px; padding: 7px 14px; cursor: pointer; transition: all .2s; }
-  .al-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
-
   .tm-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
   .tm-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .tm-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
   .tm-title span { color: var(--accent); }
   .tm-new-btn { display: flex; align-items: center; gap: 7px; background: var(--accent); color: #0d1117; border: none; border-radius: var(--radius); padding: 9px 18px; font-family: var(--font-head); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; }
   .tm-new-btn:hover { background: var(--accent2); }
-
   .tm-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; height: calc(100vh - var(--header-h) - var(--footer-h) - 88px); }
-
   .tm-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
   .tm-panel-head { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .tm-panel-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
   .tm-badge { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25); color: var(--accent); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
-
   .tm-list { overflow-y: auto; flex: 1; }
   .tm-team-btn { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-bottom: 1px solid var(--border); cursor: pointer; text-align: left; transition: background .12s; font-family: var(--font-body); }
   .tm-team-btn:hover { background: var(--surface2); }
@@ -210,13 +180,11 @@ const CSS = `
   .tm-team-pills { display: flex; gap: 5px; flex-wrap: wrap; }
   .tm-active-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   .tm-empty-list { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
-
   .tm-detail { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .tm-detail-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
   .tm-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
   .tm-empty-icon { font-size: 36px; }
   .tm-empty-txt { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
-
   .tm-info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .tm-info-icon { width: 46px; height: 46px; border-radius: 12px; background: rgba(245,166,35,.12); border: 1.5px solid rgba(245,166,35,.35); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
   .tm-info-texts { flex: 1; min-width: 0; }
@@ -228,11 +196,8 @@ const CSS = `
   .tm-btn-edit:hover { background: rgba(245,166,35,.18); }
   .tm-btn-del { display: flex; align-items: center; gap: 5px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.28); border-radius: 8px; color: #ef4444; font-family: var(--font-body); font-size: 12px; font-weight: 600; padding: 6px 13px; cursor: pointer; transition: all .15s; }
   .tm-btn-del:hover { background: rgba(239,68,68,.18); }
-
   .tm-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; border: 1px solid; white-space: nowrap; font-family: var(--font-body); }
-
   .tm-sec-lbl { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 9px; }
-
   .tm-member-list { display: flex; flex-direction: column; gap: 7px; }
   .tm-member-row { display: flex; align-items: center; gap: 11px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color .15s; }
   .tm-member-row:hover { border-color: rgba(239,68,68,.3); }
@@ -243,7 +208,6 @@ const CSS = `
   .tm-remove-btn { margin-left: auto; flex-shrink: 0; width: 28px; height: 28px; border-radius: 7px; background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; opacity: 0; }
   .tm-remove-btn:hover { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.4); color: #ef4444; }
   .tm-no-member { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--radius); }
-
   .tm-add-box { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .tm-add-box-head { padding: 11px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
   .tm-add-box-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
@@ -262,19 +226,16 @@ const CSS = `
   .tm-add-box-btn { background: var(--accent); color: #0d1117; border: none; border-radius: 8px; padding: 7px 16px; font-family: var(--font-head); font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s; }
   .tm-add-box-btn:hover:not(:disabled) { background: var(--accent2); }
   .tm-add-box-btn:disabled { opacity: .4; cursor: not-allowed; }
-
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
   .al-footer-l { font-size: 12px; color: var(--muted); }
   .al-footer-l strong { color: var(--accent); }
   .al-footer-r { font-size: 12px; color: var(--muted); }
   .al-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
   .tm-toast { position: fixed; top: 18px; right: 22px; z-index: 9999; padding: 10px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.5); border: 1px solid; animation: slideIn .2s ease; font-family: var(--font-body); }
   .tm-toast.ok  { background: rgba(62,207,90,.1);  border-color: #3ecf5a; color: #3ecf5a; }
   .tm-toast.err { background: rgba(239,68,68,.1);  border-color: #ef4444; color: #ef4444; }
   @keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-
   .tm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 300; display: flex; align-items: center; justify-content: center; animation: fadeIn .15s ease; }
   @keyframes fadeIn { from{opacity:0} to{opacity:1} }
   .tm-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 400px; padding: 26px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
@@ -291,27 +252,20 @@ const CSS = `
   .tm-confirm-btn { flex: 1; padding: 11px; border-radius: var(--radius); border: none; background: var(--accent); color: #0d1117; font-family: var(--font-head); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; }
   .tm-confirm-btn:hover:not(:disabled) { background: var(--accent2); }
   .tm-confirm-btn:disabled { opacity: .4; cursor: not-allowed; }
-
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 `;
 
 export default function Teams() {
-  const navigate = useNavigate();
-  const userName = localStorage.getItem("name") || "Admin";
-
   const [teams, setTeams] = useState([]);
   const [users, setUsers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [selUsers, setSelUsers] = useState(new Set());
-
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState("");
-
   const [createModal, setCreateModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-
   const [cForm, setCForm] = useState({
     teamName: "",
     teamType: "GENEL",
@@ -324,7 +278,11 @@ export default function Teams() {
     status: "AKTIF",
   });
 
-  /* ── VERİ YÜKLEMESİ ── */
+  const notify = (msg, type = "ok") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3200);
+  };
+
   useEffect(() => {
     fetchTeams();
     authFetch(`${API}/UserRole/users`)
@@ -337,16 +295,10 @@ export default function Teams() {
       .then((r) => r.json())
       .then((d) => setTeams(Array.isArray(d) ? d : []));
 
-  const notify = (msg, type = "ok") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3200);
-  };
-
   const pickTeam = (t) => {
     setSelected(t);
     setSelUsers(new Set());
   };
-
   const toggleUser = (id) =>
     setSelUsers((prev) => {
       const n = new Set(prev);
@@ -354,7 +306,6 @@ export default function Teams() {
       return n;
     });
 
-  /* ── OLUŞTUR ── */
   const handleCreate = async () => {
     if (!cForm.teamName.trim()) return notify("Takım adı boş olamaz", "err");
     setBusy("create");
@@ -380,7 +331,6 @@ export default function Teams() {
     }
   };
 
-  /* ── GÜNCELLE ── */
   const openEdit = (t) => {
     setEForm({
       teamId: t.teamId,
@@ -405,9 +355,7 @@ export default function Teams() {
         setSelected(data);
         setEditModal(false);
         notify(`"${data.teamName}" güncellendi`);
-      } else {
-        notify("Güncelleme başarısız", "err");
-      }
+      } else notify("Güncelleme başarısız", "err");
     } catch {
       notify("Sunucu hatası", "err");
     } finally {
@@ -415,7 +363,6 @@ export default function Teams() {
     }
   };
 
-  /* ── SİL ── */
   const handleDelete = async (teamId) => {
     if (!window.confirm("Bu takımı silmek istediğinize emin misiniz?")) return;
     setBusy("delete");
@@ -427,9 +374,7 @@ export default function Teams() {
         setTeams((p) => p.filter((t) => t.teamId !== teamId));
         if (selected?.teamId === teamId) setSelected(null);
         notify("Takım silindi");
-      } else {
-        notify("Silme başarısız", "err");
-      }
+      } else notify("Silme başarısız", "err");
     } catch {
       notify("Sunucu hatası", "err");
     } finally {
@@ -437,7 +382,6 @@ export default function Teams() {
     }
   };
 
-  /* ── ÜYE EKLE ── */
   const handleAddMembers = async () => {
     if (selUsers.size === 0) return notify("En az bir kullanıcı seçin", "err");
     setBusy("add");
@@ -455,9 +399,7 @@ export default function Teams() {
         setSelected(data);
         setSelUsers(new Set());
         notify(`${selUsers.size} üye eklendi`);
-      } else {
-        notify("Üye ekleme başarısız", "err");
-      }
+      } else notify("Üye ekleme başarısız", "err");
     } catch {
       notify("Sunucu hatası", "err");
     } finally {
@@ -465,7 +407,6 @@ export default function Teams() {
     }
   };
 
-  /* ── ÜYE ÇIKAR ── */
   const handleRemove = async (userId) => {
     try {
       const res = await authFetch(`${API}/teams/remove-member`, {
@@ -477,9 +418,7 @@ export default function Teams() {
         setTeams((p) => p.map((t) => (t.teamId === data.teamId ? data : t)));
         setSelected(data);
         notify("Üye takımdan çıkarıldı");
-      } else {
-        notify("Çıkarma başarısız", "err");
-      }
+      } else notify("Çıkarma başarısız", "err");
     } catch {
       notify("Sunucu hatası", "err");
     }
@@ -491,7 +430,6 @@ export default function Teams() {
   return (
     <>
       <style>{CSS}</style>
-
       {toast && (
         <div className={`tm-toast ${toast.type}`}>
           {toast.type === "ok" ? "✓" : "✕"} {toast.msg}
@@ -609,30 +547,7 @@ export default function Teams() {
       )}
 
       <div className="tm-shell">
-        <header className="al-header">
-          <div className="al-logo">
-            <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-            <span className="al-logo-text">
-              Aegis<span>.</span>
-            </span>
-          </div>
-          <div className="al-header-right">
-            <div className="al-user-chip">
-              <div className="al-avatar">{userName[0]?.toUpperCase()}</div>
-              <span className="al-user-name">{userName}</span>
-            </div>
-            <button
-              className="al-logout-btn"
-              onClick={() => {
-                localStorage.clear();
-                navigate("/login");
-              }}
-            >
-              <LogoutIcon /> Çıkış Yap
-            </button>
-          </div>
-        </header>
-
+        <Header />
         <Sidebar />
 
         <main className="tm-main">
@@ -646,7 +561,6 @@ export default function Teams() {
           </div>
 
           <div className="tm-layout">
-            {/* SOL — TAKIM LİSTESİ */}
             <div className="tm-panel">
               <div className="tm-panel-head">
                 <span className="tm-panel-title">Takımlar</span>
@@ -711,7 +625,6 @@ export default function Teams() {
               </div>
             </div>
 
-            {/* SAĞ — DETAY */}
             <div className="tm-panel">
               {!selected ? (
                 <div className="tm-empty-state">

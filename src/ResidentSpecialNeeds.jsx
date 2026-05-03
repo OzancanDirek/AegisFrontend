@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AegisLogo from "./images/Aegislogo.jpeg";
+import { authFetch } from "./authFetch";
 import Sidebar from "./sidebar";
+import Header from "./Header.jsx";
 
 const API = "http://localhost:8080/api";
-
-// Token'ı her istekte otomatik ekleyen yardımcı fonksiyon
-import { authFetch } from "./authFetch";
 
 const PRIORITY_CONFIG = {
   CRITICAL: {
@@ -39,20 +36,24 @@ const PRIORITY_CONFIG = {
   },
 };
 
+const PRIORITY_DESC = {
+  CRITICAL: "İlaç bağımlılığı tespit edildi — acil müdahale gerekebilir",
+  HIGH: "65 yaş üstü & özel ihtiyaç mevcut — yüksek takip gerekli",
+  MEDIUM: "Özel ihtiyaç atanmış — düzenli takip önerilir",
+  LOW: "Henüz özel ihtiyaç yok — standart bakım yeterli",
+};
+
 function calcPriority(needIds, allNeeds, birthDate) {
   const selected = allNeeds.filter((n) => needIds.has(n.needId));
   const hasMed = selected.some((n) =>
     n.needName?.toLowerCase().includes("ilaç"),
   );
   const hasAny = selected.length > 0;
-
   let age = null;
-  if (birthDate) {
+  if (birthDate)
     age = Math.floor(
       (new Date() - new Date(birthDate)) / (1000 * 60 * 60 * 24 * 365.25),
     );
-  }
-
   if (hasMed) return "CRITICAL";
   if (age !== null && age > 65 && hasAny) return "HIGH";
   if (hasAny) return "MEDIUM";
@@ -70,16 +71,6 @@ const CSS = `
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
   .sn-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
-  .al-header { grid-area: header; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px 0 0; position: sticky; top: 0; z-index: 100; }
-  .al-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px; width: var(--sidebar-w); border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
-  .al-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--text); }
-  .al-logo-text span { color: var(--accent); }
-  .al-header-right { display: flex; align-items: center; gap: 10px; }
-  .al-user-chip { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 40px; padding: 5px 14px 5px 5px; }
-  .al-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(245,166,35,0.18); border: 1px solid rgba(245,166,35,0.35); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; font-size: 13px; font-weight: 700; }
-  .al-user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .al-logout-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--font-body); font-size: 13px; padding: 7px 14px; cursor: pointer; transition: all .2s; }
-  .al-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
   .sn-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
   .sn-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; margin-bottom: 24px; letter-spacing: -.3px; }
   .sn-title span { color: var(--accent); }
@@ -145,27 +136,7 @@ const CSS = `
   .sn-priority-change-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(62,207,90,.35); background: rgba(62,207,90,.1); color: #3ecf5a; animation: snSlide .2s ease; }
 `;
 
-const PRIORITY_DESC = {
-  CRITICAL: "İlaç bağımlılığı tespit edildi — acil müdahale gerekebilir",
-  HIGH: "65 yaş üstü & özel ihtiyaç mevcut — yüksek takip gerekli",
-  MEDIUM: "Özel ihtiyaç atanmış — düzenli takip önerilir",
-  LOW: "Henüz özel ihtiyaç yok — standart bakım yeterli",
-};
-
-const LogoutIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export default function ResidentSpecialNeeds() {
-  const navigate = useNavigate();
   const [residents, setResidents] = useState([]);
   const [needs, setNeeds] = useState([]);
   const [search, setSearch] = useState("");
@@ -175,8 +146,6 @@ export default function ResidentSpecialNeeds() {
   const [toast, setToast] = useState(null);
   const [savedPriority, setSavedPriority] = useState(null);
   const [_prevPreviewPriority, setPrevPreviewPriority] = useState(null);
-
-  const userName = localStorage.getItem("name") || "Admin";
 
   useEffect(() => {
     authFetch(`${API}/residents/all`)
@@ -252,12 +221,10 @@ export default function ResidentSpecialNeeds() {
   const livePreviewPriority = selectedResident
     ? calcPriority(selectedNeedIds, needs, selectedResident.birthDate)
     : null;
-
   const priorityChanged =
     savedPriority &&
     livePreviewPriority &&
     livePreviewPriority !== savedPriority;
-
   const filtered = residents.filter((r) =>
     r.fullName?.toLowerCase().includes(search.toLowerCase()),
   );
@@ -270,31 +237,9 @@ export default function ResidentSpecialNeeds() {
           {toast.type === "success" ? "✓" : "✕"} {toast.msg}
         </div>
       )}
-      <div className="sn-shell">
-        <header className="al-header">
-          <div className="al-logo">
-            <img src={AegisLogo} alt="Logo" style={{ width: 39, height: 39 }} />
-            <span className="al-logo-text">
-              Aegis<span>.</span>
-            </span>
-          </div>
-          <div className="al-header-right">
-            <div className="al-user-chip">
-              <div className="al-avatar">{userName[0]?.toUpperCase()}</div>
-              <span className="al-user-name">{userName}</span>
-            </div>
-            <button
-              className="al-logout-btn"
-              onClick={() => {
-                localStorage.clear();
-                navigate("/login");
-              }}
-            >
-              <LogoutIcon /> Çıkış Yap
-            </button>
-          </div>
-        </header>
 
+      <div className="sn-shell">
+        <Header />
         <Sidebar />
 
         <main className="sn-main">
@@ -302,7 +247,6 @@ export default function ResidentSpecialNeeds() {
             Özel İhtiyaç <span>Atama</span>
           </div>
           <div className="sn-grid">
-            {/* SOL: SAKİN LİSTESİ */}
             <div className="sn-panel">
               <div className="sn-panel-head">
                 <span className="sn-panel-title">Sakinler</span>
@@ -321,8 +265,7 @@ export default function ResidentSpecialNeeds() {
                   <div className="sn-empty">Sakin bulunamadı</div>
                 ) : (
                   filtered.map((r) => {
-                    const p = r.priorityLevel;
-                    const cfg = PRIORITY_CONFIG[p];
+                    const cfg = PRIORITY_CONFIG[r.priorityLevel];
                     return (
                       <button
                         key={r.residentId}
@@ -358,7 +301,6 @@ export default function ResidentSpecialNeeds() {
               </div>
             </div>
 
-            {/* SAĞ: ATAMA PANELİ */}
             <div className="sn-panel">
               <div className="sn-panel-head">
                 <span className="sn-panel-title">İhtiyaç Ata</span>
