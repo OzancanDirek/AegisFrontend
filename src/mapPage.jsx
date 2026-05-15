@@ -735,7 +735,7 @@ export default function MapPage() {
         .catch(() => setLastQuake("Veri alınamadı"));
     };
     fetchQuake();
-    const interval = setInterval(fetchQuake, 60000);
+    const interval = setInterval(fetchQuake, 60000); //saniyede bir istek
     return () => clearInterval(interval);
   }, []);
 

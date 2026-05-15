@@ -53,6 +53,35 @@ const UsersIcon = () => (
     />
   </svg>
 );
+const AssignmentIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <rect
+      x="4"
+      y="3"
+      width="16"
+      height="18"
+      rx="2"
+      fill="currentColor"
+      opacity=".2"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M8 7h8M8 11h8M8 15h5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <circle cx="17" cy="16" r="3" fill="currentColor" opacity=".9" />
+    <path
+      d="M15.5 16l1 1 2-2"
+      stroke="#0d1117"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 const VolunteerIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
     <path
@@ -75,6 +104,12 @@ const VolunteerIcon = () => (
       strokeLinejoin="round"
       opacity=".8"
     />
+  </svg>
+);
+const ProfileIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="8" r="4" fill="currentColor" opacity=".9" />
+    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="currentColor" opacity=".6" />
   </svg>
 );
 const SkillIcon = () => (
@@ -220,6 +255,7 @@ const NAV_BY_ROLE = {
           label: "Özel İhtiyaçlar",
           path: "/residentspecialneeds",
         },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
     {
@@ -228,6 +264,7 @@ const NAV_BY_ROLE = {
         { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
+        { icon: <AssignmentIcon />, label: "Görevler", path: "/assignments" },
       ],
     },
   ],
@@ -240,6 +277,7 @@ const NAV_BY_ROLE = {
         { icon: <BoxIcon />, label: "Depolarım", path: "/warehouses" },
         { icon: <InventoryIcon />, label: "Envanter", path: "/inventory" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
   ],
@@ -251,8 +289,10 @@ const NAV_BY_ROLE = {
         { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <TeamIcon />, label: "Takımım", path: "/my-team" },
-        { icon: <VolunteerIcon />, label: "Profilim", path: "/volunteers" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
+        { icon: <AssignmentIcon />, label: "Görevlerim", path: "/volunteer-dashboard" },
+
       ],
     },
   ],
@@ -271,6 +311,8 @@ const NAV_BY_ROLE = {
         { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
         { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <AssignmentIcon />, label: "Görevler", path: "/assignments" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
   ],
@@ -283,6 +325,8 @@ const NAV_BY_ROLE = {
         { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <AlertIcon />, label: "Yardım Talebi", path: "/requests" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
+        { icon: <AssignmentIcon />, label: "Taleplerim", path: "/depremzede-dashboard" },
       ],
     },
   ],
@@ -293,7 +337,13 @@ const NAV_BY_ROLE = {
       items: [
         { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
+        {
+          icon: <VolunteerIcon />,
+          label: "Gönüllü Ol",
+          path: "/volunteer-register",
+        },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
   ],

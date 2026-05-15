@@ -20,7 +20,11 @@ import Warehouses from "./warehouse.jsx";
 import Announcements from "./announcements.jsx";
 import Home from "./home.jsx";
 import Requests from "./requests.jsx";
-
+import Assignments from "./assignments.jsx";
+import VolunteerRegister from "./volunteerRegister.jsx";
+import Profile from "./Profile.jsx";
+import VolunteerDashboard from "./Volunteerdashboard.jsx";
+import DepremzedeDashboard from "./depremzedeDashboard.jsx";
 
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("aegis_token");
@@ -117,6 +121,14 @@ createRoot(document.getElementById("root")).render(
           }
         />
         <Route
+          path="/volunteer-dashboard"
+          element={
+            <PrivateRoute allowedRoles={["Gonullu"]}>
+              <VolunteerDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/home"
           element={
             <PrivateRoute
@@ -150,7 +162,47 @@ createRoot(document.getElementById("root")).render(
             </PrivateRoute>
           }
         />
-
+        <Route
+          path="/assignments"
+          element={
+            <PrivateRoute allowedRoles={["Admin", "Calisan"]}>
+              <Assignments />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute
+              allowedRoles={[
+                "Admin",
+                "Calisan",
+                "Gonullu",
+                "Depremzede",
+                "WAREHOUSE_MANAGER",
+                "User",
+              ]}
+            >
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/volunteer-register"
+          element={
+            <PrivateRoute allowedRoles={["User", "Gonullu"]}>
+              <VolunteerRegister />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/depremzede-dashboard"
+          element={
+            <PrivateRoute allowedRoles={["Depremzede"]}>
+              <DepremzedeDashboard />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/announcements"
           element={

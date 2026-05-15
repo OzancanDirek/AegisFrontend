@@ -61,15 +61,24 @@ const CSS = `
   .rm-toast.success { background: rgba(62,207,90,.1); border-color: #3ecf5a; color: #3ecf5a; }
   .rm-toast.error   { background: rgba(239,68,68,.1);  border-color: #ef4444; color: #ef4444; }
   @keyframes rmSlide { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
   .rm-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100vh - var(--header-h) - var(--footer-h) - 48px); }
   .rm-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
   .rm-panel-head { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .rm-panel-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
   .rm-panel-count { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25); color: var(--accent); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: var(--font-body); }
+
+  /* Sekmeler */
+  .rm-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .rm-tab { flex: 1; padding: 10px; font-size: 12px; font-weight: 700; font-family: var(--font-head); color: var(--muted); background: transparent; border: none; cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; }
+  .rm-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(245,166,35,.04); }
+  .rm-tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
   .rm-search-wrap { padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .rm-search { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s; }
   .rm-search:focus { border-color: rgba(245,166,35,.5); }
   .rm-search::placeholder { color: var(--muted); }
+
   .rm-user-list { overflow-y: auto; flex: 1; }
   .rm-user-btn { width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--muted); cursor: pointer; text-align: left; transition: background .12s; font-family: var(--font-body); }
   .rm-user-btn:hover { background: var(--surface2); color: var(--text); }
@@ -84,6 +93,8 @@ const CSS = `
   .rm-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; }
   .rm-empty-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; }
   .rm-empty-txt { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  /* Rol atama alanı */
   .rm-assign-area { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
   .rm-ucard { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
   .rm-ucard-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: rgba(245,166,35,.15); border: 1.5px solid rgba(245,166,35,.4); color: var(--accent); }
@@ -105,6 +116,34 @@ const CSS = `
   .rm-assign-btn { width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--accent); color: #0d1117; font-size: 13px; font-weight: 700; font-family: var(--font-head); cursor: pointer; transition: background .15s, opacity .15s; margin-top: auto; }
   .rm-assign-btn:hover:not(:disabled) { background: var(--accent2); }
   .rm-assign-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* Rol yönetimi paneli */
+  .rm-role-mgmt { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .rm-role-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color .15s; }
+  .rm-role-row:hover { border-color: rgba(245,166,35,.3); }
+  .rm-role-row-left { display: flex; flex-direction: column; gap: 3px; }
+  .rm-role-row-name { font-size: 13px; font-weight: 700; color: var(--text); font-family: var(--font-head); }
+  .rm-role-row-desc { font-size: 11px; color: var(--muted); }
+  .rm-role-row-actions { display: flex; gap: 8px; }
+  .rm-icon-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
+  .rm-icon-btn:hover { color: var(--text); border-color: var(--muted); }
+  .rm-icon-btn.danger:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,.08); }
+
+  /* Yeni rol / düzenleme formu */
+  .rm-form { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
+  .rm-form-title { font-size: 12px; font-weight: 700; font-family: var(--font-head); color: var(--accent); letter-spacing: .5px; }
+  .rm-input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 9px 12px; font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s; width: 100%; }
+  .rm-input:focus { border-color: rgba(245,166,35,.5); }
+  .rm-input::placeholder { color: var(--muted); }
+  .rm-form-actions { display: flex; gap: 8px; margin-top: 2px; }
+  .rm-btn-primary { flex: 1; padding: 9px; border-radius: 8px; border: none; background: var(--accent); color: #0d1117; font-size: 12px; font-weight: 700; font-family: var(--font-head); cursor: pointer; transition: background .15s, opacity .15s; }
+  .rm-btn-primary:hover:not(:disabled) { background: var(--accent2); }
+  .rm-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .rm-btn-secondary { padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; font-family: var(--font-body); cursor: pointer; transition: all .15s; }
+  .rm-btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+  .rm-add-btn { width: 100%; padding: 10px; border-radius: var(--radius); border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; font-family: var(--font-head); cursor: pointer; transition: all .15s; margin-top: auto; }
+  .rm-add-btn:hover { border-color: rgba(245,166,35,.4); color: var(--accent); background: rgba(245,166,35,.04); }
+
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
   .al-footer-l { font-size: 12px; color: var(--muted); }
   .al-footer-l strong { color: var(--accent); }
@@ -123,10 +162,25 @@ export default function RoleManager() {
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
 
+  // sağ panel sekme: "assign" | "manage"
+  const [rightTab, setRightTab] = useState("assign");
+
+  // rol yönetimi state
+  const [showForm, setShowForm] = useState(false);
+  const [editingRole, setEditingRole] = useState(null); // null = yeni, obje = düzenle
+  const [formName, setFormName] = useState("");
+  const [formDesc, setFormDesc] = useState("");
+  const [formBusy, setFormBusy] = useState(false);
+
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3200);
   };
+
+  const fetchRoles = () =>
+    authFetch(`${API}/all`)
+      .then((r) => r.json())
+      .then((d) => setRoles(d.roles || []));
 
   useEffect(() => {
     Promise.all([
@@ -175,6 +229,87 @@ export default function RoleManager() {
     }
   };
 
+  // --- Rol yönetimi işlemleri ---
+  const openCreate = () => {
+    setEditingRole(null);
+    setFormName("");
+    setFormDesc("");
+    setShowForm(true);
+  };
+
+  const openEdit = (role) => {
+    setEditingRole(role);
+    setFormName(getRoleName(role));
+    setFormDesc(role.description || "");
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingRole(null);
+    setFormName("");
+    setFormDesc("");
+  };
+
+  const handleSaveRole = async () => {
+    if (!formName.trim()) return showToast("Rol adı boş olamaz", "error");
+    setFormBusy(true);
+    try {
+      if (editingRole) {
+        // Güncelle
+        const res = await authFetch(`${API}/roles`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            roleId: getRoleId(editingRole),
+            roleName: formName.trim(),
+            description: formDesc.trim(),
+          }),
+        });
+        const data = await res.json();
+        showToast(
+          data.message || "Güncellendi",
+          data.success ? "success" : "error",
+        );
+      } else {
+        // Oluştur
+        const res = await authFetch(`${API}/roles`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            roleName: formName.trim(),
+            description: formDesc.trim(),
+          }),
+        });
+        const data = await res.json();
+        showToast(
+          data.message || "Oluşturuldu",
+          data.success ? "success" : "error",
+        );
+      }
+      await fetchRoles();
+      closeForm();
+    } catch {
+      showToast("İşlem başarısız", "error");
+    } finally {
+      setFormBusy(false);
+    }
+  };
+
+  const handleDeleteRole = async (roleId) => {
+    if (!window.confirm("Bu rolü silmek istediğinize emin misiniz?")) return;
+    try {
+      const res = await authFetch(`${API}/roles/${roleId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      showToast(data.message || "Silindi", data.success ? "success" : "error");
+      await fetchRoles();
+    } catch {
+      showToast("Silinemedi", "error");
+    }
+  };
+
   const filteredUsers = users.filter((u) =>
     getDisplayName(u).toLowerCase().includes(search.toLowerCase()),
   );
@@ -194,6 +329,7 @@ export default function RoleManager() {
 
         <main className="rm-main">
           <div className="rm-content">
+            {/* SOL PANEL — kullanıcı listesi */}
             <div className="rm-panel">
               <div className="rm-panel-head">
                 <span className="rm-panel-title">Kullanıcılar</span>
@@ -238,105 +374,225 @@ export default function RoleManager() {
               </div>
             </div>
 
+            {/* SAĞ PANEL — sekmeli */}
             <div className="rm-panel">
               <div className="rm-panel-head">
-                <span className="rm-panel-title">Rol Atama</span>
-                {selected && (
+                <span className="rm-panel-title">
+                  {rightTab === "assign" ? "Rol Atama" : "Rol Yönetimi"}
+                </span>
+                {rightTab === "assign" && selected && (
                   <span className="rm-panel-count">
                     {getDisplayName(selected)}
                   </span>
                 )}
+                {rightTab === "manage" && (
+                  <span className="rm-panel-count">{roles.length} rol</span>
+                )}
               </div>
-              {!selected ? (
-                <div className="rm-empty-state">
-                  <div className="rm-empty-icon">👤</div>
-                  <p className="rm-empty-txt">
-                    Sol listeden bir kullanıcı seçin
-                    <br />
-                    rol atama paneli burada görünecek
-                  </p>
-                </div>
-              ) : (
-                <div className="rm-assign-area">
-                  <div className="rm-ucard">
-                    <div className="rm-ucard-avatar">
-                      {getDisplayName(selected)[0]?.toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="rm-ucard-name">
-                        {getDisplayName(selected)}
-                      </div>
-                      <div className="rm-ucard-id">
-                        ID: {getUserId(selected)}
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="rm-section">
-                    <div className="rm-section-lbl">Mevcut Rol</div>
-                    <div className="rm-role-tags">
-                      {selected.currentRoles?.length > 0 ? (
-                        selected.currentRoles.map((r) => {
-                          const rName = getRoleName(r);
-                          const s = getRoleStyle(rName);
-                          return (
+              <div className="rm-tabs">
+                <button
+                  className={`rm-tab ${rightTab === "assign" ? "active" : ""}`}
+                  onClick={() => setRightTab("assign")}
+                >
+                  Rol Ata
+                </button>
+                <button
+                  className={`rm-tab ${rightTab === "manage" ? "active" : ""}`}
+                  onClick={() => setRightTab("manage")}
+                >
+                  Rolleri Yönet
+                </button>
+              </div>
+
+              {/* ROL ATAMA SEKMESİ */}
+              {rightTab === "assign" && (
+                <>
+                  {!selected ? (
+                    <div className="rm-empty-state">
+                      <div className="rm-empty-icon">👤</div>
+                      <p className="rm-empty-txt">
+                        Sol listeden bir kullanıcı seçin
+                        <br />
+                        rol atama paneli burada görünecek
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rm-assign-area">
+                      <div className="rm-ucard">
+                        <div className="rm-ucard-avatar">
+                          {getDisplayName(selected)[0]?.toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="rm-ucard-name">
+                            {getDisplayName(selected)}
+                          </div>
+                          <div className="rm-ucard-id">
+                            ID: {getUserId(selected)}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rm-section">
+                        <div className="rm-section-lbl">Mevcut Rol</div>
+                        <div className="rm-role-tags">
+                          {selected.currentRoles?.length > 0 ? (
+                            selected.currentRoles.map((r) => {
+                              const rName = getRoleName(r);
+                              const s = getRoleStyle(rName);
+                              return (
+                                <span
+                                  key={getRoleId(r)}
+                                  className="rm-role-tag"
+                                  style={{
+                                    background: s.bg,
+                                    borderColor: s.border,
+                                    color: s.text,
+                                  }}
+                                >
+                                  {rName}
+                                </span>
+                              );
+                            })
+                          ) : (
+                            <span className="rm-no-role">
+                              Henüz rol atanmamış
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rm-section">
+                        <div className="rm-section-lbl">Yeni Rol Seç</div>
+                        <div className="rm-role-grid">
+                          {roles.map((r) => {
+                            const rId = getRoleId(r);
+                            const rName = getRoleName(r);
+                            const s = getRoleStyle(rName);
+                            const isChosen = selectedRole === rId;
+                            return (
+                              <div
+                                key={rId}
+                                className={`rm-role-card ${isChosen ? "chosen" : ""}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedRole(rId);
+                                }}
+                              >
+                                <div
+                                  className="rm-rc-dot"
+                                  style={{
+                                    background: isChosen ? s.border : "#253045",
+                                  }}
+                                />
+                                <span className="rm-rc-name">{rName}</span>
+                                {isChosen && (
+                                  <div className="rm-rc-check">✓</div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <button
+                        className="rm-assign-btn"
+                        onClick={handleAssign}
+                        disabled={assigning || !selectedRole}
+                      >
+                        {assigning ? "Atanıyor..." : "Rolü Ata"}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* ROL YÖNETİMİ SEKMESİ */}
+              {rightTab === "manage" && (
+                <div className="rm-role-mgmt">
+                  {showForm && (
+                    <div className="rm-form">
+                      <div className="rm-form-title">
+                        {editingRole ? "Rolü Düzenle" : "Yeni Rol Oluştur"}
+                      </div>
+                      <input
+                        className="rm-input"
+                        placeholder="Rol adı (ör. Koordinator)"
+                        value={formName}
+                        onChange={(e) => setFormName(e.target.value)}
+                      />
+                      <input
+                        className="rm-input"
+                        placeholder="Açıklama (isteğe bağlı)"
+                        value={formDesc}
+                        onChange={(e) => setFormDesc(e.target.value)}
+                      />
+                      <div className="rm-form-actions">
+                        <button
+                          className="rm-btn-secondary"
+                          onClick={closeForm}
+                        >
+                          İptal
+                        </button>
+                        <button
+                          className="rm-btn-primary"
+                          onClick={handleSaveRole}
+                          disabled={formBusy}
+                        >
+                          {formBusy
+                            ? "Kaydediliyor..."
+                            : editingRole
+                              ? "Güncelle"
+                              : "Oluştur"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {roles.length === 0 ? (
+                    <div className="rm-empty">Henüz rol yok</div>
+                  ) : (
+                    roles.map((r) => {
+                      const rId = getRoleId(r);
+                      const rName = getRoleName(r);
+                      const s = getRoleStyle(rName);
+                      return (
+                        <div key={rId} className="rm-role-row">
+                          <div className="rm-role-row-left">
                             <span
-                              key={getRoleId(r)}
-                              className="rm-role-tag"
-                              style={{
-                                background: s.bg,
-                                borderColor: s.border,
-                                color: s.text,
-                              }}
+                              className="rm-role-row-name"
+                              style={{ color: s.text }}
                             >
                               {rName}
                             </span>
-                          );
-                        })
-                      ) : (
-                        <span className="rm-no-role">Henüz rol atanmamış</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="rm-section">
-                    <div className="rm-section-lbl">Yeni Rol Seç</div>
-                    <div className="rm-role-grid">
-                      {roles.map((r) => {
-                        const rId = getRoleId(r);
-                        const rName = getRoleName(r);
-                        const s = getRoleStyle(rName);
-                        const isChosen = selectedRole === rId;
-                        return (
-                          <div
-                            key={rId}
-                            className={`rm-role-card ${isChosen ? "chosen" : ""}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedRole(rId);
-                            }}
-                          >
-                            <div
-                              className="rm-rc-dot"
-                              style={{
-                                background: isChosen ? s.border : "#253045",
-                              }}
-                            />
-                            <span className="rm-rc-name">{rName}</span>
-                            {isChosen && <div className="rm-rc-check">✓</div>}
+                            <span className="rm-role-row-desc">
+                              {r.description || "Açıklama yok"}
+                            </span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                          <div className="rm-role-row-actions">
+                            <button
+                              className="rm-icon-btn"
+                              onClick={() => openEdit(r)}
+                            >
+                              Düzenle
+                            </button>
+                            <button
+                              className="rm-icon-btn danger"
+                              onClick={() => handleDeleteRole(rId)}
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
 
-                  <button
-                    className="rm-assign-btn"
-                    onClick={handleAssign}
-                    disabled={assigning || !selectedRole}
-                  >
-                    {assigning ? "Atanıyor..." : "Rolü Ata"}
-                  </button>
+                  {!showForm && (
+                    <button className="rm-add-btn" onClick={openCreate}>
+                      + Yeni Rol Ekle
+                    </button>
+                  )}
                 </div>
               )}
             </div>

@@ -8,8 +8,12 @@ const refreshAccessToken = async () => {
   try {
     const res = await fetch(`${BASE}/api/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        refreshToken
+      }),
     });
 
     if (!res.ok) return null;
@@ -44,7 +48,7 @@ export const authFetch = async (url, options = {}) => {
   let res = await makeRequest(token);
 
   // 403 gelirse token'ı refresh et ve tekrar dene
-  if (res.status === 403) {
+  if (res.status === 401 || res.status === 403) {
     const newToken = await refreshAccessToken();
 
     if (newToken) {
@@ -52,7 +56,7 @@ export const authFetch = async (url, options = {}) => {
     } else {
       // Refresh da başarısız → login sayfasına yönlendir
       localStorage.clear();
-      window.location.href = "/login";
+      window.location.replace("/login");
       return res;
     }
   }
