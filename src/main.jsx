@@ -25,6 +25,9 @@ import VolunteerRegister from "./volunteerRegister.jsx";
 import Profile from "./Profile.jsx";
 import VolunteerDashboard from "./Volunteerdashboard.jsx";
 import DepremzedeDashboard from "./depremzedeDashboard.jsx";
+import WarehouseMap from "./warehouseMap.jsx";
+import AuditLog from "./auditLog.jsx";
+
 
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("aegis_token");
@@ -128,6 +131,7 @@ createRoot(document.getElementById("root")).render(
             </PrivateRoute>
           }
         />
+
         <Route
           path="/home"
           element={
@@ -188,6 +192,14 @@ createRoot(document.getElementById("root")).render(
           }
         />
         <Route
+          path="/audit-logs"
+          element={
+            <PrivateRoute allowedRoles={["Admin"]}>
+              <AuditLog />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/volunteer-register"
           element={
             <PrivateRoute allowedRoles={["User", "Gonullu"]}>
@@ -200,6 +212,14 @@ createRoot(document.getElementById("root")).render(
           element={
             <PrivateRoute allowedRoles={["Depremzede"]}>
               <DepremzedeDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/warehouse-map"
+          element={
+            <PrivateRoute allowedRoles={["Admin", "WAREHOUSE_MANAGER"]}>
+              <WarehouseMap />
             </PrivateRoute>
           }
         />

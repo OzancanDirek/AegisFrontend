@@ -248,13 +248,15 @@ const NAV_BY_ROLE = {
         { icon: <UsersIcon />, label: "Rol Yönetimi", path: "/admin/roles" },
         { icon: <SkillIcon />, label: "Yetenekler", path: "/skills" },
         { icon: <AddressIcon />, label: "Adresler", path: "/addresses" },
-        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
+        { icon: <DashboardIcon />, label: "Loglar", path: "/audit-logs" },
+
         {
           icon: <SpecialNeedsIcon />,
           label: "Özel İhtiyaçlar",
           path: "/residentspecialneeds",
         },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
@@ -262,37 +264,10 @@ const NAV_BY_ROLE = {
       section: "Operasyon",
       items: [
         { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
-        { icon: <MapIcon />, label: "Harita", path: "/map" },
-        { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
         { icon: <AssignmentIcon />, label: "Görevler", path: "/assignments" },
-      ],
-    },
-  ],
-
-  WAREHOUSE_MANAGER: [
-    {
-      section: "Menü",
-      items: [
-        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
-        { icon: <BoxIcon />, label: "Depolarım", path: "/warehouses" },
-        { icon: <InventoryIcon />, label: "Envanter", path: "/inventory" },
-        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
-        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
-      ],
-    },
-  ],
-
-  Gonullu: [
-    {
-      section: "Menü",
-      items: [
-        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
+        { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
+        { icon: <MapIcon />, label: "Depo Haritası", path: "/warehouse-map" },
         { icon: <MapIcon />, label: "Harita", path: "/map" },
-        { icon: <TeamIcon />, label: "Takımım", path: "/my-team" },
-        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
-        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
-        { icon: <AssignmentIcon />, label: "Görevlerim", path: "/volunteer-dashboard" },
-
       ],
     },
   ],
@@ -307,11 +282,45 @@ const NAV_BY_ROLE = {
           label: "Dashboard",
           path: "/adminDashboard",
         },
-        { icon: <MapIcon />, label: "Harita", path: "/map" },
-        { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
         { icon: <AlertIcon />, label: "Talepler", path: "/requests" },
-        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <AssignmentIcon />, label: "Görevler", path: "/assignments" },
+        { icon: <TeamIcon />, label: "Takımlar", path: "/teams" },
+        { icon: <BoxIcon />, label: "Depolar", path: "/warehouses" },
+        { icon: <MapIcon />, label: "Depo Haritası", path: "/warehouse-map" },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
+      ],
+    },
+  ],
+
+  WAREHOUSE_MANAGER: [
+    {
+      section: "Menü",
+      items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
+        { icon: <BoxIcon />, label: "Depolarım", path: "/warehouses" },
+        { icon: <MapIcon />, label: "Depo Haritası", path: "/warehouse-map" },
+        { icon: <InventoryIcon />, label: "Envanter", path: "/inventory" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
+        { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
+      ],
+    },
+  ],
+
+  Gonullu: [
+    {
+      section: "Menü",
+      items: [
+        { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
+        {
+          icon: <AssignmentIcon />,
+          label: "Görevlerim",
+          path: "/volunteer-dashboard",
+        },
+        { icon: <TeamIcon />, label: "Takımım", path: "/my-team" },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
+        { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],
     },
@@ -322,11 +331,15 @@ const NAV_BY_ROLE = {
       section: "Menü",
       items: [
         { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
-        { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <AlertIcon />, label: "Yardım Talebi", path: "/requests" },
+        {
+          icon: <AssignmentIcon />,
+          label: "Taleplerim",
+          path: "/depremzede-dashboard",
+        },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
-        { icon: <AssignmentIcon />, label: "Taleplerim", path: "/depremzede-dashboard" },
       ],
     },
   ],
@@ -336,12 +349,12 @@ const NAV_BY_ROLE = {
       section: "Menü",
       items: [
         { icon: <HomeIcon />, label: "Ana Sayfa", path: "/home" },
-        { icon: <MapIcon />, label: "Harita", path: "/map" },
         {
           icon: <VolunteerIcon />,
           label: "Gönüllü Ol",
           path: "/volunteer-register",
         },
+        { icon: <MapIcon />, label: "Harita", path: "/map" },
         { icon: <BellIcon />, label: "Duyurular", path: "/announcements" },
         { icon: <ProfileIcon />, label: "Profilim", path: "/profile" },
       ],

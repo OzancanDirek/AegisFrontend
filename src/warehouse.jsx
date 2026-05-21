@@ -3,6 +3,8 @@ import { authFetch } from "./authFetch";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
+const API = "http://localhost:8080/api";
+
 const SearchIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
     <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
@@ -80,6 +82,23 @@ const EditIcon = () => (
     />
   </svg>
 );
+const BoxIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M21 8l-9-5-9 5v8l9 5 9-5V8z" fill="currentColor" opacity=".8" />
+    <path d="M3 8l9 5 9-5M12 13v8" stroke="#0d1117" strokeWidth="1.2" />
+  </svg>
+);
+const AlertIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2L2 19h20L12 2z" fill="currentColor" opacity=".8" />
+    <path
+      d="M12 9v4M12 16.5v.5"
+      stroke="#0d1117"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -95,20 +114,16 @@ const CSS = `
   .al-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
   .al-main { grid-area: main; padding: 28px; overflow-y: auto; background: var(--bg); }
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-  .al-footer-l { font-size: 12px; color: var(--muted); }
-  .al-footer-l strong { color: var(--accent); }
-  .al-footer-r { font-size: 12px; color: var(--muted); }
+  .al-footer-l { font-size: 12px; color: var(--muted); } .al-footer-l strong { color: var(--accent); } .al-footer-r { font-size: 12px; color: var(--muted); }
   .al-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
   .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .dash-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
-  .dash-title span { color: var(--accent); }
-  .wh-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .dash-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; color: var(--text); } .dash-title span { color: var(--accent); }
+  .wh-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
   .wh-stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
   .wh-stat-label { font-size: 11px; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; }
   .wh-stat-value { font-family: var(--font-head); font-size: 26px; font-weight: 700; color: var(--text); }
-  .wh-stat-value.green { color: #3ecf5a; }
-  .wh-stat-value.accent { color: var(--accent2); }
+  .wh-stat-value.green { color: #3ecf5a; } .wh-stat-value.accent { color: var(--accent2); } .wh-stat-value.red { color: #ef4444; }
   .wh-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
   .wh-search-wrap { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; flex: 1; min-width: 200px; max-width: 320px; }
   .wh-search-wrap input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font-body); font-size: 13px; width: 100%; }
@@ -122,24 +137,24 @@ const CSS = `
   .dash-table thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
   .dash-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
   .dash-table td { padding: 13px 16px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .dash-table tbody tr:last-child td { border-bottom: none; }
-  .dash-table tbody tr:hover td { background: var(--surface2); }
+  .dash-table tbody tr:last-child td { border-bottom: none; } .dash-table tbody tr:hover td { background: var(--surface2); }
   .dash-id { font-family: monospace; font-size: 11px; color: var(--muted); }
   .dash-empty { padding: 48px; text-align: center; color: var(--muted); font-size: 14px; }
   .dash-error { background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.2); border-radius: var(--radius); padding: 16px 20px; color: var(--accent2); font-size: 14px; margin-bottom: 16px; }
   .wh-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
-  .wh-status.ACTIVE   { background: rgba(62,207,90,.1);    color: #3ecf5a; }
-  .wh-status.INACTIVE { background: rgba(107,128,153,.1);  color: var(--muted); }
-  .wh-status.FULL     { background: rgba(245,166,35,.1);   color: var(--accent2); }
+  .wh-status.ACTIVE { background: rgba(62,207,90,.1); color: #3ecf5a; } .wh-status.INACTIVE { background: rgba(107,128,153,.1); color: var(--muted); } .wh-status.FULL { background: rgba(245,166,35,.1); color: var(--accent2); }
   .wh-delete-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); font-family: var(--font-body); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .2s; }
   .wh-delete-btn:hover { border-color: #e05c5c; color: #e05c5c; }
   .wh-edit-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); font-family: var(--font-body); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .2s; margin-right: 6px; }
   .wh-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .wh-inv-btn { display: flex; align-items: center; gap: 5px; background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.2); border-radius: 7px; color: var(--accent); font-family: var(--font-body); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .2s; margin-right: 6px; }
+  .wh-inv-btn:hover { background: rgba(245,166,35,.18); }
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: middle; margin-right: 8px; }
   .loading-row td { text-align: center; padding: 48px !important; color: var(--muted); font-size: 14px; }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: modalIn .2s ease; }
+  .modal-box.wide { max-width: 780px; }
   @keyframes modalIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
   .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
   .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; color: var(--text); }
@@ -151,24 +166,267 @@ const CSS = `
   .modal-field.full { grid-column: 1 / -1; }
   .modal-label { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
   .modal-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .2s; width: 100%; }
-  .modal-input:focus { border-color: var(--accent); }
-  .modal-input::placeholder { color: var(--muted); }
+  .modal-input:focus { border-color: var(--accent); } .modal-input::placeholder { color: var(--muted); }
   select.modal-input option { background: var(--surface2); }
   .modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
   .modal-cancel { background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--font-body); font-size: 13px; padding: 8px 18px; cursor: pointer; transition: all .2s; }
   .modal-cancel:hover { border-color: var(--accent); color: var(--accent); }
   .modal-submit { background: var(--accent); border: none; border-radius: 8px; color: #0d1117; font-family: var(--font-body); font-size: 13px; font-weight: 500; padding: 8px 20px; cursor: pointer; transition: opacity .2s; }
-  .modal-submit:hover { opacity: .85; }
-  .modal-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .modal-submit:hover { opacity: .85; } .modal-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .modal-section-divider { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); padding: 4px 0 2px; border-bottom: 1px solid var(--border); }
+  .inv-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+  .inv-add-btn { display: flex; align-items: center; gap: 6px; background: var(--accent); border: none; border-radius: 8px; color: #0d1117; font-family: var(--font-body); font-size: 12px; font-weight: 600; padding: 7px 14px; cursor: pointer; transition: opacity .2s; }
+  .inv-add-btn:hover { opacity: .85; }
+  .inv-table-wrap { padding: 0 24px 24px; }
+  .inv-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  .inv-table th { text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .inv-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .inv-table tbody tr:last-child td { border-bottom: none; } .inv-table tbody tr:hover td { background: rgba(255,255,255,.02); }
+  .inv-critical-row td { background: rgba(239,68,68,.04) !important; }
+  .inv-critical-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3); color: #ef4444; }
+  .inv-qty { font-weight: 600; } .inv-qty.critical { color: #ef4444; } .inv-qty.ok { color: #3ecf5a; }
+  .inv-empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .inv-category { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+  .inv-expiry { font-size: 12px; } .inv-expiry.soon { color: #f97316; } .inv-expiry.expired { color: #ef4444; } .inv-expiry.ok { color: var(--muted); }
+  .coord-hint { font-size: 10px; color: var(--muted); margin-top: 3px; }
 `;
 
-const EMPTY_FORM = {
+const EMPTY_WH_FORM = {
   name: "",
   managerId: "",
   addressId: "",
   capacityM3: "",
   status: "ACTIVE",
+  city: "",
+  district: "",
+  neighborhood: "",
+  latitude: "",
+  longitude: "",
 };
+const EMPTY_INV_FORM = {
+  itemName: "",
+  category: "",
+  quantity: "",
+  unit: "Adet",
+  criticalThreshold: "",
+  expiryDate: "",
+};
+
+function getExpiryClass(expiryDate) {
+  if (!expiryDate) return "";
+  const diff = (new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24);
+  if (diff < 0) return "expired";
+  if (diff < 30) return "soon";
+  return "ok";
+}
+
+const WhForm = ({ f, setF, userList }) => (
+  <div className="modal-body">
+    <div className="modal-field full">
+      <label className="modal-label">Depo Adi *</label>
+      <input
+        className="modal-input"
+        placeholder="örn. Merkez Depo"
+        value={f.name}
+        onChange={(e) => setF((p) => ({ ...p, name: e.target.value }))}
+      />
+    </div>
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Yonetici</label>
+        <select
+          className="modal-input"
+          value={f.managerId}
+          onChange={(e) => setF((p) => ({ ...p, managerId: e.target.value }))}
+        >
+          <option value="">— Seciniz —</option>
+          {userList.map((u) => (
+            <option key={u.userId} value={u.userId}>
+              {u.name} {u.surname}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Durum</label>
+        <select
+          className="modal-input"
+          value={f.status}
+          onChange={(e) => setF((p) => ({ ...p, status: e.target.value }))}
+        >
+          <option value="ACTIVE">Aktif</option>
+          <option value="INACTIVE">Pasif</option>
+          <option value="FULL">Dolu</option>
+        </select>
+      </div>
+    </div>
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Kapasite (m3)</label>
+        <input
+          className="modal-input"
+          type="number"
+          placeholder="örn. 500"
+          value={f.capacityM3}
+          onChange={(e) => setF((p) => ({ ...p, capacityM3: e.target.value }))}
+        />
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Adres ID (opsiyonel)</label>
+        <input
+          className="modal-input"
+          type="number"
+          placeholder="örn. 12"
+          value={f.addressId}
+          onChange={(e) => setF((p) => ({ ...p, addressId: e.target.value }))}
+        />
+      </div>
+    </div>
+
+    <div className="modal-section-divider">Adres Bilgileri</div>
+
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Sehir</label>
+        <input
+          className="modal-input"
+          placeholder="örn. Istanbul"
+          value={f.city}
+          onChange={(e) => setF((p) => ({ ...p, city: e.target.value }))}
+        />
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Ilce</label>
+        <input
+          className="modal-input"
+          placeholder="örn. Kadikoy"
+          value={f.district}
+          onChange={(e) => setF((p) => ({ ...p, district: e.target.value }))}
+        />
+      </div>
+    </div>
+    <div className="modal-field">
+      <label className="modal-label">Mahalle</label>
+      <input
+        className="modal-input"
+        placeholder="örn. Moda Mahallesi"
+        value={f.neighborhood}
+        onChange={(e) => setF((p) => ({ ...p, neighborhood: e.target.value }))}
+      />
+    </div>
+
+    <div className="modal-section-divider">Harita Konumu</div>
+
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Enlem (Latitude)</label>
+        <input
+          className="modal-input"
+          type="number"
+          step="any"
+          placeholder="örn. 41.0082"
+          value={f.latitude}
+          onChange={(e) => setF((p) => ({ ...p, latitude: e.target.value }))}
+        />
+        <span className="coord-hint">Kuzey = pozitif, Güney = negatif</span>
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Boylam (Longitude)</label>
+        <input
+          className="modal-input"
+          type="number"
+          step="any"
+          placeholder="örn. 28.9784"
+          value={f.longitude}
+          onChange={(e) => setF((p) => ({ ...p, longitude: e.target.value }))}
+        />
+        <span className="coord-hint">Dogu = pozitif, Bati = negatif</span>
+      </div>
+    </div>
+  </div>
+);
+
+const ItemFormFields = ({ f, setF }) => (
+  <div className="modal-body">
+    <div className="modal-field full">
+      <label className="modal-label">Urun Adi *</label>
+      <input
+        className="modal-input"
+        placeholder="örn. Su (1.5L)"
+        value={f.itemName}
+        onChange={(e) => setF((p) => ({ ...p, itemName: e.target.value }))}
+      />
+    </div>
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Kategori</label>
+        <select
+          className="modal-input"
+          value={f.category}
+          onChange={(e) => setF((p) => ({ ...p, category: e.target.value }))}
+        >
+          <option value="">— Seciniz —</option>
+          <option value="Gida">Gida</option>
+          <option value="Su">Su</option>
+          <option value="Tibbi Malzeme">Tibbi Malzeme</option>
+          <option value="Barinma">Barinma</option>
+          <option value="Giyim">Giyim</option>
+          <option value="Elektronik">Elektronik</option>
+          <option value="Arac Gerec">Arac Gerec</option>
+          <option value="Diger">Diger</option>
+        </select>
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Birim</label>
+        <select
+          className="modal-input"
+          value={f.unit}
+          onChange={(e) => setF((p) => ({ ...p, unit: e.target.value }))}
+        >
+          <option value="Adet">Adet</option>
+          <option value="KG">KG</option>
+          <option value="Litre">Litre</option>
+          <option value="Paket">Paket</option>
+          <option value="Kutu">Kutu</option>
+          <option value="Cuval">Cuval</option>
+        </select>
+      </div>
+    </div>
+    <div className="modal-row">
+      <div className="modal-field">
+        <label className="modal-label">Miktar</label>
+        <input
+          className="modal-input"
+          type="number"
+          placeholder="0"
+          value={f.quantity}
+          onChange={(e) => setF((p) => ({ ...p, quantity: e.target.value }))}
+        />
+      </div>
+      <div className="modal-field">
+        <label className="modal-label">Kritik Esik</label>
+        <input
+          className="modal-input"
+          type="number"
+          placeholder="örn. 50"
+          value={f.criticalThreshold}
+          onChange={(e) =>
+            setF((p) => ({ ...p, criticalThreshold: e.target.value }))
+          }
+        />
+      </div>
+    </div>
+    <div className="modal-field">
+      <label className="modal-label">Son Kullanma Tarihi</label>
+      <input
+        className="modal-input"
+        type="date"
+        value={f.expiryDate}
+        onChange={(e) => setF((p) => ({ ...p, expiryDate: e.target.value }))}
+      />
+    </div>
+  </div>
+);
 
 export default function Warehouses() {
   const [warehouses, setWarehouses] = useState([]);
@@ -178,19 +436,24 @@ export default function Warehouses() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userList, setUserList] = useState([]);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(EMPTY_WH_FORM);
   const [editModal, setEditModal] = useState(false);
   const [editForm, setEditForm] = useState(null);
+  const [invModal, setInvModal] = useState(false);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null);
+  const [items, setItems] = useState([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
+  const [showItemForm, setShowItemForm] = useState(false);
+  const [itemForm, setItemForm] = useState(EMPTY_INV_FORM);
+  const [editItemModal, setEditItemModal] = useState(false);
+  const [editItemForm, setEditItemForm] = useState(null);
+  const [criticalCount, setCriticalCount] = useState(0);
 
-  const adminEmail = localStorage.getItem("email") || "";
 
   const fetchAll = async () => {
     setLoading(true);
-    setMessage("");
     try {
-      const res = await authFetch(
-        "http://localhost:8080/api/warehouse/getAllWarehouse",
-      );
+      const res = await authFetch(`${API}/warehouse/getAllWarehouse`);
       const data = await res.json();
       setWarehouses(Array.isArray(data) ? data : []);
     } catch {
@@ -202,35 +465,130 @@ export default function Warehouses() {
 
   const fetchUsers = async () => {
     try {
-      const res = await authFetch(
-        `http://localhost:8080/api/admin/adminUserList?email=${adminEmail}`,
-      );
+      const res = await authFetch(`${API}/warehouse/warehouse-managers`);
       const data = await res.json();
       setUserList(Array.isArray(data) ? data : []);
-    } catch {
-      setMessage("Kullanıcılar getirilemedi.");
+    } catch (error) {
+      console.error("Warehouse manager'lar getirilemedi:", error);
+    }
+  };
+
+  const fetchCriticalCount = async () => {
+    try {
+      const res = await authFetch(`${API}/inventory/critical`);
+      const data = await res.json();
+      setCriticalCount(Array.isArray(data) ? data.length : 0);
+    } catch (error) {
+      console.error("Kritik esik sayısı getirilemedi:", error);
     }
   };
 
   useEffect(() => {
     fetchAll();
     fetchUsers();
+    fetchCriticalCount();
   }, []);
 
+  const openInventory = async (w) => {
+    setSelectedWarehouse(w);
+    setInvModal(true);
+    setShowItemForm(false);
+    setItemForm(EMPTY_INV_FORM);
+    setItemsLoading(true);
+    try {
+      const res = await authFetch(
+        `${API}/inventory/warehouse/${w.warehouseId}`,
+      );
+      const data = await res.json();
+      setItems(Array.isArray(data) ? data : []);
+    } catch {
+      setItems([]);
+    } finally {
+      setItemsLoading(false);
+    }
+  };
 
-  const openModal = () => {
-    setForm(EMPTY_FORM);
-    setShowModal(true);
+  const handleCreateItem = async () => {
+    if (!itemForm.itemName.trim()) return;
+    try {
+      const res = await authFetch(`${API}/inventory`, {
+        method: "POST",
+        body: JSON.stringify({
+          warehouseId: selectedWarehouse.warehouseId,
+          itemName: itemForm.itemName,
+          category: itemForm.category || null,
+          quantity: itemForm.quantity ? Number(itemForm.quantity) : 0,
+          unit: itemForm.unit || "Adet",
+          criticalThreshold: itemForm.criticalThreshold
+            ? Number(itemForm.criticalThreshold)
+            : null,
+          expiryDate: itemForm.expiryDate || null,
+        }),
+      });
+      if (res.ok) {
+        const newItem = await res.json();
+        setItems((prev) => [...prev, newItem]);
+        setItemForm(EMPTY_INV_FORM);
+        setShowItemForm(false);
+        fetchCriticalCount();
+      }
+    } catch (error) {
+      console.error("Urun olusturulurken hata:", error);
+    }
+  };
+
+  const handleUpdateItem = async () => {
+    if (!editItemForm?.itemName?.trim()) return;
+    try {
+      const res = await authFetch(`${API}/inventory/${editItemForm.itemId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          itemName: editItemForm.itemName,
+          category: editItemForm.category || null,
+          quantity: editItemForm.quantity ? Number(editItemForm.quantity) : 0,
+          unit: editItemForm.unit || "Adet",
+          criticalThreshold: editItemForm.criticalThreshold
+            ? Number(editItemForm.criticalThreshold)
+            : null,
+          expiryDate: editItemForm.expiryDate || null,
+        }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setItems((prev) =>
+          prev.map((i) => (i.itemId === updated.itemId ? updated : i)),
+        );
+        setEditItemModal(false);
+        fetchCriticalCount();
+      }
+    } catch (error) {
+      console.error("Urun guncellenirken hata:", error);
+    }
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm("Bu urunu silmek istediginize emin misiniz?")) return;
+    try {
+      const res = await authFetch(`${API}/inventory/${itemId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setItems((prev) => prev.filter((i) => i.itemId !== itemId));
+        fetchCriticalCount();
+      }
+    } catch (error) {
+      console.error("Urun silinirken hata:", error);
+    }
   };
 
   const handleCreate = async () => {
     if (!form.name.trim()) {
-      setMessage("Depo adı zorunludur.");
+      setMessage("Depo adi zorunludur.");
       return;
     }
     setSubmitting(true);
     try {
-      const res = await authFetch("http://localhost:8080/api/warehouse", {
+      const res = await authFetch(`${API}/warehouse`, {
         method: "POST",
         body: JSON.stringify({
           name: form.name,
@@ -238,76 +596,67 @@ export default function Warehouses() {
           addressId: form.addressId ? Number(form.addressId) : null,
           capacityM3: form.capacityM3 ? Number(form.capacityM3) : null,
           status: form.status,
+          city: form.city || null,
+          district: form.district || null,
+          neighborhood: form.neighborhood || null,
+          latitude: form.latitude ? Number(form.latitude) : null,
+          longitude: form.longitude ? Number(form.longitude) : null,
         }),
       });
       if (res.ok) {
         setShowModal(false);
         fetchAll();
       } else {
-        const data = await res.json();
-        setMessage(data.message || "Depo oluşturulamadı.");
-        setShowModal(false);
+        const d = await res.json();
+        setMessage(d.message || "Depo olusturulamadi.");
       }
     } catch {
-      setMessage("Depo oluşturulamadı.");
-      setShowModal(false);
+      setMessage("Depo olusturulamadi.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const openEdit = (w) => {
-    setEditForm({
-      warehouseId: w.warehouseId,
-      name: w.name || "",
-      managerId: w.managerId || "",
-      addressId: w.addressId || "",
-      capacityM3: w.capacityM3 || "",
-      status: w.status || "ACTIVE",
-    });
-    setEditModal(true);
-  };
-
   const handleUpdate = async () => {
     if (!editForm.name.trim()) {
-      setMessage("Depo adı zorunludur.");
+      setMessage("Depo adi zorunludur.");
       return;
     }
     setSubmitting(true);
     try {
-      const res = await authFetch(
-        `http://localhost:8080/api/warehouse/${editForm.warehouseId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            name: editForm.name,
-            managerId: editForm.managerId || null,
-            addressId: editForm.addressId ? Number(editForm.addressId) : null,
-            capacityM3: editForm.capacityM3
-              ? Number(editForm.capacityM3)
-              : null,
-            status: editForm.status,
-          }),
-        },
-      );
+      const res = await authFetch(`${API}/warehouse/${editForm.warehouseId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: editForm.name,
+          managerId: editForm.managerId || null,
+          addressId: editForm.addressId ? Number(editForm.addressId) : null,
+          capacityM3: editForm.capacityM3 ? Number(editForm.capacityM3) : null,
+          status: editForm.status,
+          city: editForm.city || null,
+          district: editForm.district || null,
+          neighborhood: editForm.neighborhood || null,
+          latitude: editForm.latitude ? Number(editForm.latitude) : null,
+          longitude: editForm.longitude ? Number(editForm.longitude) : null,
+        }),
+      });
       if (res.ok) {
         setEditModal(false);
         fetchAll();
       } else {
-        const data = await res.json();
-        setMessage(data.message || "Güncelleme başarısız.");
+        const d = await res.json();
+        setMessage(d.message || "Guncelleme basarisiz.");
       }
     } catch {
-      setMessage("Güncelleme başarısız.");
+      setMessage("Guncelleme basarisiz.");
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bu depoyu silmek istediğinize emin misiniz?")) return;
+    if (!window.confirm("Bu depoyu silmek istediginize emin misiniz?")) return;
     try {
-      const res = await authFetch(`http://localhost:8080/api/warehouse/${id}`, {
+      const res = await authFetch(`${API}/warehouse/${id}`, {
         method: "DELETE",
       });
       if (res.ok)
@@ -336,93 +685,25 @@ export default function Warehouses() {
     0,
   );
 
-  const ModalFields = ({ f, setF }) => (
-    <>
-      <div className="modal-body">
-        <div className="modal-field full">
-          <label className="modal-label">Depo Adı *</label>
-          <input
-            className="modal-input"
-            placeholder="örn. Merkez Depo"
-            value={f.name}
-            onChange={(e) => setF((p) => ({ ...p, name: e.target.value }))}
-          />
-        </div>
-        <div className="modal-row">
-          <div className="modal-field">
-            <label className="modal-label">Yönetici</label>
-            <select
-              className="modal-input"
-              value={f.managerId}
-              onChange={(e) =>
-                setF((p) => ({ ...p, managerId: e.target.value }))
-              }
-            >
-              <option value="">— Seçiniz —</option>
-              {userList.map((u) => (
-                <option key={u.userId} value={u.userId}>
-                  {u.name} {u.surname}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="modal-field">
-            <label className="modal-label">Durum</label>
-            <select
-              className="modal-input"
-              value={f.status}
-              onChange={(e) => setF((p) => ({ ...p, status: e.target.value }))}
-            >
-              <option value="ACTIVE">Aktif</option>
-              <option value="INACTIVE">Pasif</option>
-              <option value="FULL">Dolu</option>
-            </select>
-          </div>
-        </div>
-        <div className="modal-row">
-          <div className="modal-field">
-            <label className="modal-label">Kapasite (m³)</label>
-            <input
-              className="modal-input"
-              type="number"
-              placeholder="örn. 500"
-              value={f.capacityM3}
-              onChange={(e) =>
-                setF((p) => ({ ...p, capacityM3: e.target.value }))
-              }
-            />
-          </div>
-          <div className="modal-field">
-            <label className="modal-label">Adres ID</label>
-            <input
-              className="modal-input"
-              type="number"
-              placeholder="örn. 12"
-              value={f.addressId}
-              onChange={(e) =>
-                setF((p) => ({ ...p, addressId: e.target.value }))
-              }
-            />
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <>
       <style>{CSS}</style>
       <div className="al-shell">
         <Header />
         <Sidebar />
-
         <main className="al-main">
           <div className="page-header">
             <div className="dash-title">
-              Depo <span>Yönetimi</span>
+              Depo <span>Yonetimi</span>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button className="wh-add-btn" onClick={openModal}>
+              <button
+                className="wh-add-btn"
+                onClick={() => {
+                  setForm(EMPTY_WH_FORM);
+                  setShowModal(true);
+                }}
+              >
                 <PlusIcon /> Depo Ekle
               </button>
               <button className="wh-refresh-btn" onClick={fetchAll}>
@@ -444,8 +725,16 @@ export default function Warehouses() {
               <div className="wh-stat-label">Toplam Kapasite</div>
               <div className="wh-stat-value accent">
                 {totalCapacity > 0
-                  ? `${totalCapacity.toLocaleString()} m³`
+                  ? `${totalCapacity.toLocaleString()} m3`
                   : "—"}
+              </div>
+            </div>
+            <div className="wh-stat-card">
+              <div className="wh-stat-label">Kritik Stok</div>
+              <div
+                className={`wh-stat-value ${criticalCount > 0 ? "red" : "green"}`}
+              >
+                {criticalCount}
               </div>
             </div>
           </div>
@@ -454,7 +743,7 @@ export default function Warehouses() {
             <div className="wh-search-wrap">
               <SearchIcon />
               <input
-                placeholder="Depo adı, şehir, yönetici ara…"
+                placeholder="Depo adi, sehir, yonetici ara..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
@@ -465,26 +754,27 @@ export default function Warehouses() {
 
           <div className="dash-table-wrap">
             {filtered.length === 0 && !loading ? (
-              <div className="dash-empty">Depo bulunamadı.</div>
+              <div className="dash-empty">Depo bulunamadi.</div>
             ) : (
               <table className="dash-table">
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Depo Adı</th>
-                    <th>Yönetici</th>
+                    <th>Depo Adi</th>
+                    <th>Yonetici</th>
                     <th>Konum</th>
+                    <th>Koordinat</th>
                     <th>Kapasite</th>
                     <th>Durum</th>
-                    <th>İşlem</th>
+                    <th>Islem</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr className="loading-row">
-                      <td colSpan={7}>
+                      <td colSpan={8}>
                         <span className="spinner" />
-                        Yükleniyor…
+                        Yukleniyor...
                       </td>
                     </tr>
                   ) : (
@@ -502,6 +792,19 @@ export default function Warehouses() {
                               .join(", ") ||
                             "—"}
                         </td>
+                        <td
+                          style={{
+                            fontSize: 11,
+                            color: "var(--muted)",
+                            fontFamily: "monospace",
+                          }}
+                        >
+                          {w.latitude && w.longitude ? (
+                            `${Number(w.latitude).toFixed(4)}, ${Number(w.longitude).toFixed(4)}`
+                          ) : (
+                            <span style={{ color: "#ef4444" }}>Yok</span>
+                          )}
+                        </td>
                         <td>
                           {w.capacityM3 != null ? (
                             <span
@@ -510,7 +813,7 @@ export default function Warehouses() {
                                 fontWeight: 500,
                               }}
                             >
-                              {w.capacityM3.toLocaleString()} m³
+                              {w.capacityM3.toLocaleString()} m3
                             </span>
                           ) : (
                             "—"
@@ -527,10 +830,31 @@ export default function Warehouses() {
                         </td>
                         <td>
                           <button
-                            className="wh-edit-btn"
-                            onClick={() => openEdit(w)}
+                            className="wh-inv-btn"
+                            onClick={() => openInventory(w)}
                           >
-                            <EditIcon /> Düzenle
+                            <BoxIcon /> Envanter
+                          </button>
+                          <button
+                            className="wh-edit-btn"
+                            onClick={() => {
+                              setEditForm({
+                                warehouseId: w.warehouseId,
+                                name: w.name || "",
+                                managerId: w.managerId || "",
+                                addressId: w.addressId || "",
+                                capacityM3: w.capacityM3 || "",
+                                status: w.status || "ACTIVE",
+                                city: w.city || "",
+                                district: w.district || "",
+                                neighborhood: w.neighborhood || "",
+                                latitude: w.latitude || "",
+                                longitude: w.longitude || "",
+                              });
+                              setEditModal(true);
+                            }}
+                          >
+                            <EditIcon /> Duzenle
                           </button>
                           <button
                             className="wh-delete-btn"
@@ -547,15 +871,12 @@ export default function Warehouses() {
             )}
           </div>
         </main>
-
         <footer className="al-footer">
           <div className="al-footer-l">
             <span className="al-dot" />
-            <strong>Aegis</strong> Afet Yönetim Sistemi &nbsp;·&nbsp; v1.0.0
+            <strong>Aegis</strong> Afet Yonetim Sistemi &nbsp;·&nbsp; v1.0.0
           </div>
-          <div className="al-footer-r">
-            ©️ 2026 Aegis. Tüm hakları saklıdır.
-          </div>
+          <div className="al-footer-r">2026 Aegis.</div>
         </footer>
       </div>
 
@@ -574,20 +895,20 @@ export default function Warehouses() {
                 <CloseIcon />
               </button>
             </div>
-            <ModalFields f={form} setF={setForm} />
+            <WhForm f={form} setF={setForm} userList={userList} />
             <div className="modal-foot">
               <button
                 className="modal-cancel"
                 onClick={() => setShowModal(false)}
               >
-                İptal
+                Iptal
               </button>
               <button
                 className="modal-submit"
                 onClick={handleCreate}
                 disabled={submitting}
               >
-                {submitting ? "Kaydediliyor…" : "Kaydet"}
+                {submitting ? "Kaydediliyor..." : "Kaydet"}
               </button>
             </div>
           </div>
@@ -602,7 +923,7 @@ export default function Warehouses() {
           <div className="modal-box">
             <div className="modal-head">
               <span className="modal-title">
-                Depo Düzenle{" "}
+                Depo Duzenle{" "}
                 <span style={{ color: "var(--accent)" }}>
                   #{editForm.warehouseId}
                 </span>
@@ -614,20 +935,227 @@ export default function Warehouses() {
                 <CloseIcon />
               </button>
             </div>
-            <ModalFields f={editForm} setF={setEditForm} />
+            <WhForm f={editForm} setF={setEditForm} userList={userList} />
             <div className="modal-foot">
               <button
                 className="modal-cancel"
                 onClick={() => setEditModal(false)}
               >
-                İptal
+                Iptal
               </button>
               <button
                 className="modal-submit"
                 onClick={handleUpdate}
                 disabled={submitting}
               >
-                {submitting ? "Güncelleniyor…" : "Güncelle"}
+                {submitting ? "Guncelleniyor..." : "Guncelle"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {invModal && selectedWarehouse && (
+        <div
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setInvModal(false)}
+        >
+          <div className="modal-box wide">
+            <div className="modal-head">
+              <span className="modal-title">
+                {selectedWarehouse.name} — Envanter
+                {items.some((i) => i.critical) && (
+                  <span
+                    style={{
+                      marginLeft: 10,
+                      fontSize: 11,
+                      color: "#ef4444",
+                      fontWeight: 600,
+                    }}
+                  >
+                    ⚠ {items.filter((i) => i.critical).length} Kritik Stok
+                  </span>
+                )}
+              </span>
+              <button
+                className="modal-close"
+                onClick={() => setInvModal(false)}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="inv-toolbar">
+              <span style={{ fontSize: 13, color: "var(--muted)" }}>
+                {items.length} urun
+              </span>
+              <button
+                className="inv-add-btn"
+                onClick={() => setShowItemForm(!showItemForm)}
+              >
+                <PlusIcon /> {showItemForm ? "Iptal" : "Urun Ekle"}
+              </button>
+            </div>
+            {showItemForm && (
+              <div
+                style={{
+                  borderBottom: "1px solid var(--border)",
+                  background: "var(--surface2)",
+                }}
+              >
+                <ItemFormFields f={itemForm} setF={setItemForm} />
+                <div
+                  className="modal-foot"
+                  style={{ borderTop: "1px solid var(--border)" }}
+                >
+                  <button
+                    className="modal-cancel"
+                    onClick={() => setShowItemForm(false)}
+                  >
+                    Iptal
+                  </button>
+                  <button className="modal-submit" onClick={handleCreateItem}>
+                    Ekle
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="inv-table-wrap">
+              {itemsLoading ? (
+                <div className="inv-empty">
+                  <span className="spinner" /> Yukleniyor...
+                </div>
+              ) : items.length === 0 ? (
+                <div className="inv-empty">Bu depoda henuz urun yok.</div>
+              ) : (
+                <table className="inv-table">
+                  <thead>
+                    <tr>
+                      <th>Urun Adi</th>
+                      <th>Kategori</th>
+                      <th>Miktar</th>
+                      <th>Kritik Esik</th>
+                      <th>SKT</th>
+                      <th>Islem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => {
+                      const expiryClass = getExpiryClass(item.expiryDate);
+                      return (
+                        <tr
+                          key={item.itemId}
+                          className={item.critical ? "inv-critical-row" : ""}
+                        >
+                          <td>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              {item.critical && (
+                                <span className="inv-critical-badge">
+                                  <AlertIcon /> Kritik
+                                </span>
+                              )}
+                              <span style={{ fontWeight: 500 }}>
+                                {item.itemName}
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            {item.category ? (
+                              <span className="inv-category">
+                                {item.category}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td>
+                            <span
+                              className={`inv-qty ${item.critical ? "critical" : "ok"}`}
+                            >
+                              {item.quantity} {item.unit}
+                            </span>
+                          </td>
+                          <td style={{ color: "var(--muted)", fontSize: 12 }}>
+                            {item.criticalThreshold
+                              ? `${item.criticalThreshold} ${item.unit}`
+                              : "—"}
+                          </td>
+                          <td>
+                            {item.expiryDate ? (
+                              <span className={`inv-expiry ${expiryClass}`}>
+                                {expiryClass === "expired"
+                                  ? "⚠ "
+                                  : expiryClass === "soon"
+                                    ? "⏰ "
+                                    : ""}
+                                {new Date(item.expiryDate).toLocaleDateString(
+                                  "tr-TR",
+                                )}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td>
+                            <button
+                              className="wh-edit-btn"
+                              onClick={() => {
+                                setEditItemForm({ ...item });
+                                setEditItemModal(true);
+                              }}
+                            >
+                              <EditIcon /> Duzenle
+                            </button>
+                            <button
+                              className="wh-delete-btn"
+                              onClick={() => handleDeleteItem(item.itemId)}
+                            >
+                              <TrashIcon /> Sil
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editItemModal && editItemForm && (
+        <div
+          className="modal-overlay"
+          onClick={(e) =>
+            e.target === e.currentTarget && setEditItemModal(false)
+          }
+        >
+          <div className="modal-box">
+            <div className="modal-head">
+              <span className="modal-title">Urun Duzenle</span>
+              <button
+                className="modal-close"
+                onClick={() => setEditItemModal(false)}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <ItemFormFields f={editItemForm} setF={setEditItemForm} />
+            <div className="modal-foot">
+              <button
+                className="modal-cancel"
+                onClick={() => setEditItemModal(false)}
+              >
+                Iptal
+              </button>
+              <button className="modal-submit" onClick={handleUpdateItem}>
+                Guncelle
               </button>
             </div>
           </div>

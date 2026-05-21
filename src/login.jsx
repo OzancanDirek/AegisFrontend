@@ -51,7 +51,7 @@ export default function Login() {
       if (data.addressId) localStorage.setItem("addressId", data.addressId); 
 
       const role = data.role;
-      if (role === "Admin") navigate("/home");
+      if (role === "Admin") navigate("/adminDashboard");
       else if (role === "Calisan") navigate("/home");
       else if (role === "WAREHOUSE_MANAGER") navigate("/home");
       else if (role === "Gonullu") navigate("/home");
