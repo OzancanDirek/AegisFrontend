@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "./authFetch.js";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar.jsx";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -106,7 +107,7 @@ export default function Profile() {
   };
 
   const fetchProfile = () => {
-    authFetch(`${API}/users/profile`)
+    authFetch(`${API_BASE_URL}/users/profile`)
       .then((r) => r.json())
       .then((data) => {
         setProfile(data);
@@ -127,7 +128,7 @@ export default function Profile() {
   const handleSave = async () => {
     setBusy(true);
     try {
-      const res = await authFetch(`${API}/users/profile`, {
+      const res = await authFetch(`${API_BASE_URL}/users/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

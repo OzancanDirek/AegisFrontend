@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -114,7 +115,7 @@ export default function WarehouseMap() {
   const fullCount = warehouses.filter((w) => w.status === "FULL").length;
 
   useEffect(() => {
-    authFetch(`${API}/warehouse/getAllWarehouse`)
+    authFetch(`${API_BASE_URL}/warehouse/getAllWarehouse`)
       .then((r) => r.json())
       .then((data) => setWarehouses(Array.isArray(data) ? data : []))
       .catch(() => {})

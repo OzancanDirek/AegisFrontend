@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -159,10 +159,10 @@ export default function AdminDashboard() {
     const fetchAll = async () => {
       try {
         const [reqRes, asgRes, volRes, critRes] = await Promise.all([
-          authFetch(`${API}/aid-requests`),
-          authFetch(`${API}/assignments`),
-          authFetch(`${API}/volunteer`),
-          authFetch(`${API}/inventory/critical`),
+          authFetch(`${API_BASE_URL}/aid-requests`),
+          authFetch(`${API_BASE_URL}/assignments`),
+          authFetch(`${API_BASE_URL}/volunteer`),
+          authFetch(`${API_BASE_URL}/inventory/critical`),
         ]);
         const [reqData, asgData, volData, critData] = await Promise.all([
           reqRes.json(),

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const ACTION_COLORS = {
   CREATE: {
@@ -180,7 +181,7 @@ export default function AuditLog() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await authFetch(`${API}/audit`);
+      const res = await authFetch(`${API_BASE_URL}/audit`);
       const data = await res.json();
       setLogs(Array.isArray(data) ? data : []);
     } catch (error) {

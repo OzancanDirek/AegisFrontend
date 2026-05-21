@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "./authFetch.js";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar.jsx";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const STATUS_COLS = [
   { key: "PENDING", label: "Bekliyor", color: "#6b8099" },
@@ -110,12 +111,12 @@ export default function VolunteerDashboard() {
   };
 
   useEffect(() => {
-    authFetch(`${API}/users/profile`)
+    authFetch(`${API_BASE_URL}/users/profile`)
       .then((r) => r.json())
       .then((p) => {
         setProfile(p);
         if (p.volunteerId) {
-          return authFetch(`${API}/assignments/volunteer/${p.volunteerId}`)
+          return authFetch(`${API_BASE_URL}/assignments/volunteer/${p.volunteerId}`)
             .then((r) => r.json())
             .then((a) => setAssignments(Array.isArray(a) ? a : []));
         }

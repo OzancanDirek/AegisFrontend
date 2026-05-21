@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "./authFetch.js";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar.jsx";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -106,7 +107,7 @@ export default function VolunteerRegister() {
   };
 
   useEffect(() => {
-    authFetch(`${API}/skill`)
+    authFetch(`${API_BASE_URL}/skill`)
       .then((r) => r.json())
       .then((data) => setSkills(Array.isArray(data) ? data : []))
       .catch(() => showToast("Yetenekler yüklenemedi", "error"));
@@ -141,7 +142,7 @@ export default function VolunteerRegister() {
         skillIds: form.selectedSkills.length > 0 ? form.selectedSkills : null,
       };
 
-      const res = await authFetch(`${API}/volunteer`, {
+      const res = await authFetch(`${API_BASE_URL}/volunteer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

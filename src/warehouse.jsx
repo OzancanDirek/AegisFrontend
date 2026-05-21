@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const SearchIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -453,7 +454,7 @@ export default function Warehouses() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const res = await authFetch(`${API}/warehouse/getAllWarehouse`);
+      const res = await authFetch(`${API_BASE_URL}/warehouse/getAllWarehouse`);
       const data = await res.json();
       setWarehouses(Array.isArray(data) ? data : []);
     } catch {
@@ -465,7 +466,7 @@ export default function Warehouses() {
 
   const fetchUsers = async () => {
     try {
-      const res = await authFetch(`${API}/warehouse/warehouse-managers`);
+      const res = await authFetch(`${API_BASE_URL}/warehouse/warehouse-managers`);
       const data = await res.json();
       setUserList(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -475,7 +476,7 @@ export default function Warehouses() {
 
   const fetchCriticalCount = async () => {
     try {
-      const res = await authFetch(`${API}/inventory/critical`);
+      const res = await authFetch(`${API_BASE_URL}/inventory/critical`);
       const data = await res.json();
       setCriticalCount(Array.isArray(data) ? data.length : 0);
     } catch (error) {
@@ -497,7 +498,7 @@ export default function Warehouses() {
     setItemsLoading(true);
     try {
       const res = await authFetch(
-        `${API}/inventory/warehouse/${w.warehouseId}`,
+        `${API_BASE_URL}/inventory/warehouse/${w.warehouseId}`,
       );
       const data = await res.json();
       setItems(Array.isArray(data) ? data : []);
@@ -511,7 +512,7 @@ export default function Warehouses() {
   const handleCreateItem = async () => {
     if (!itemForm.itemName.trim()) return;
     try {
-      const res = await authFetch(`${API}/inventory`, {
+      const res = await authFetch(`${API_BASE_URL}/inventory`, {
         method: "POST",
         body: JSON.stringify({
           warehouseId: selectedWarehouse.warehouseId,
@@ -540,7 +541,7 @@ export default function Warehouses() {
   const handleUpdateItem = async () => {
     if (!editItemForm?.itemName?.trim()) return;
     try {
-      const res = await authFetch(`${API}/inventory/${editItemForm.itemId}`, {
+      const res = await authFetch(`${API_BASE_URL}/inventory/${editItemForm.itemId}`, {
         method: "PUT",
         body: JSON.stringify({
           itemName: editItemForm.itemName,
@@ -569,7 +570,7 @@ export default function Warehouses() {
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm("Bu urunu silmek istediginize emin misiniz?")) return;
     try {
-      const res = await authFetch(`${API}/inventory/${itemId}`, {
+      const res = await authFetch(`${API_BASE_URL}/inventory/${itemId}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -588,7 +589,7 @@ export default function Warehouses() {
     }
     setSubmitting(true);
     try {
-      const res = await authFetch(`${API}/warehouse`, {
+      const res = await authFetch(`${API_BASE_URL}/warehouse`, {
         method: "POST",
         body: JSON.stringify({
           name: form.name,
@@ -624,7 +625,7 @@ export default function Warehouses() {
     }
     setSubmitting(true);
     try {
-      const res = await authFetch(`${API}/warehouse/${editForm.warehouseId}`, {
+      const res = await authFetch(`${API_BASE_URL}/warehouse/${editForm.warehouseId}`, {
         method: "PUT",
         body: JSON.stringify({
           name: editForm.name,
@@ -656,7 +657,7 @@ export default function Warehouses() {
   const handleDelete = async (id) => {
     if (!window.confirm("Bu depoyu silmek istediginize emin misiniz?")) return;
     try {
-      const res = await authFetch(`${API}/warehouse/${id}`, {
+      const res = await authFetch(`${API_BASE_URL}/warehouse/${id}`, {
         method: "DELETE",
       });
       if (res.ok)

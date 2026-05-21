@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
-
-const API = "http://localhost:8080/api/aid-requests";
 
 const STATUS_CONFIG = {
   PENDING: {
@@ -121,9 +120,7 @@ const CSS = `
   .rq-cancel-btn:hover { border-color: var(--accent); color: var(--accent); }
   .rq-status-select { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px 8px; font-size: 12px; cursor: pointer; font-family: var(--font-body); outline: none; }
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-  .al-footer-l { font-size: 12px; color: var(--muted); }
-  .al-footer-l strong { color: var(--accent); }
-  .al-footer-r { font-size: 12px; color: var(--muted); }
+  .al-footer-l { font-size: 12px; color: var(--muted); } .al-footer-l strong { color: var(--accent); } .al-footer-r { font-size: 12px; color: var(--muted); }
   .al-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 `;
@@ -175,22 +172,23 @@ export default function Requests() {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
+
   const loadTypes = () =>
-    authFetch(`${API}/types`)
+    authFetch(`${API_BASE_URL}/aid-requests/types`)
       .then((r) => r.json())
       .then(setTypes)
       .catch(() => {});
+
   const loadRequests = (hhId) =>
-    authFetch(`${API}/household/${hhId}`)
+    authFetch(`${API_BASE_URL}/aid-requests/household/${hhId}`)
       .then((r) => r.json())
       .then(setRequests)
       .catch(() => {});
 
   useEffect(() => {
     loadTypes();
-
     if (isAdmin) {
-      authFetch(API)
+      authFetch(`${API_BASE_URL}/aid-requests`)
         .then((r) => r.json())
         .then((data) => {
           setRequests(Array.isArray(data) ? data : []);
@@ -198,7 +196,7 @@ export default function Requests() {
         })
         .catch(() => setPhase("admin"));
     } else {
-      authFetch(`${API}/my-household`)
+      authFetch(`${API_BASE_URL}/aid-requests/my-household`)
         .then((r) => r.json())
         .then((data) => {
           if (data && data.householdId) {
@@ -224,7 +222,7 @@ export default function Requests() {
     }
     setSaving(true);
     try {
-      const res = await authFetch(`${API}/my-household`, {
+      const res = await authFetch(`${API_BASE_URL}/aid-requests/my-household`, {
         method: "POST",
         body: JSON.stringify(hhForm),
       });
@@ -250,7 +248,7 @@ export default function Requests() {
     }
     setSaving(true);
     try {
-      const res = await authFetch(API, {
+      const res = await authFetch(`${API_BASE_URL}/aid-requests`, {
         method: "POST",
         body: JSON.stringify({
           householdId: household.householdId,
@@ -273,7 +271,7 @@ export default function Requests() {
 
   const handleStatusChange = async (requestId, newStatus) => {
     try {
-      const res = await authFetch(API, {
+      const res = await authFetch(`${API_BASE_URL}/aid-requests`, {
         method: "PUT",
         body: JSON.stringify({ requestId, status: newStatus }),
       });
@@ -357,7 +355,6 @@ export default function Requests() {
     );
   };
 
-  // LOADING
   if (phase === "loading")
     return (
       <>
@@ -376,7 +373,6 @@ export default function Requests() {
       </>
     );
 
-  // SETUP — Depremzede ilk kez, household yok
   if (phase === "setup")
     return (
       <>
@@ -392,7 +388,7 @@ export default function Requests() {
                 </div>
                 <div className="rq-setup-desc">
                   Yardım talebinde bulunabilmek için önce hane bilgilerinizi
-                  kaydediniz. Bu bilgiler yardım ekiplerine ulaşmamızı sağlar.
+                  kaydediniz.
                 </div>
               </div>
               <div className="rq-setup-body">
@@ -468,7 +464,6 @@ export default function Requests() {
       </>
     );
 
-  // ADMIN — Tüm talepler + statü güncelleme
   if (phase === "admin")
     return (
       <>
@@ -503,7 +498,6 @@ export default function Requests() {
       </>
     );
 
-  // MAIN — Depremzede kendi talepleri
   return (
     <>
       <style>{CSS}</style>
@@ -512,7 +506,6 @@ export default function Requests() {
           {toast.type === "success" ? "✓" : "✕"} {toast.msg}
         </div>
       )}
-
       <div className="rq-shell">
         <Header />
         <Sidebar />
@@ -533,7 +526,6 @@ export default function Requests() {
               </button>
             </div>
           </div>
-
           <div>
             <div className="rq-list-head" style={{ marginBottom: 14 }}>
               <span className="rq-list-title">Talepler</span>
@@ -559,7 +551,6 @@ export default function Requests() {
             )}
           </div>
         </main>
-
         <Footer />
       </div>
 
@@ -627,7 +618,7 @@ export default function Requests() {
                 <label className="rq-label">Açıklama *</label>
                 <textarea
                   className="rq-textarea"
-                  placeholder="İhtiyacınızı detaylı açıklayınız... Kaç kişisiniz? Özel durumunuz var mı?"
+                  placeholder="İhtiyacınızı detaylı açıklayınız..."
                   value={form.description}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, description: e.target.value }))

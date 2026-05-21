@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api/addresses";
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -195,7 +195,7 @@ export default function Addresses() {
 
   const loadAddresses = async () => {
     try {
-      const res = await authFetch(`${API}/allAdresses`);
+      const res = await authFetch(`${API_BASE_URL}/addresses/allAdresses`);
       const data = await res.json();
       setAddresses(Array.isArray(data) ? data : []);
     } catch {
@@ -216,7 +216,7 @@ export default function Addresses() {
     }
     setSaving(true);
     try {
-      const res = await authFetch(API, {
+      const res = await authFetch(`${API_BASE_URL}/addresses`, {
         method: "POST",
         body: JSON.stringify({
           ...form,
@@ -246,7 +246,9 @@ export default function Addresses() {
   const deleteAddress = async (id) => {
     if (!window.confirm("Bu adresi silmek istediğinize emin misiniz?")) return;
     try {
-      const res = await authFetch(`${API}/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API_BASE_URL}/addresses/${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
         showToast("Adres silindi", "success");
         loadAddresses();
@@ -289,7 +291,7 @@ export default function Addresses() {
     }
     setUpdating(true);
     try {
-      const res = await authFetch(`${API}/${editModal.id}`, {
+      const res = await authFetch(`${API_BASE_URL}/addresses/${editModal.id}`, {
         method: "PUT",
         body: JSON.stringify({
           ...editModal.form,

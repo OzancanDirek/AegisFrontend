@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const PRIORITY_CONFIG = {
   CRITICAL: {
@@ -148,10 +149,10 @@ export default function ResidentSpecialNeeds() {
   const [_prevPreviewPriority, setPrevPreviewPriority] = useState(null);
 
   useEffect(() => {
-    authFetch(`${API}/residents/all`)
+    authFetch(`${API_BASE_URL}/residents/all`)
       .then((r) => r.json())
       .then((d) => setResidents(Array.isArray(d) ? d : []));
-    authFetch(`${API}/special-needs/all`)
+    authFetch(`${API_BASE_URL}/special-needs/all`)
       .then((r) => r.json())
       .then((d) => setNeeds(Array.isArray(d) ? d : []));
   }, []);
@@ -181,7 +182,7 @@ export default function ResidentSpecialNeeds() {
     setSaving(true);
     try {
       const res = await authFetch(
-        `${API}/residents/${selectedResident.residentId}/special-needs`,
+        `${API_BASE_URL}/residents/${selectedResident.residentId}/special-needs`,
         {
           method: "POST",
           body: JSON.stringify([...selectedNeedIds]),

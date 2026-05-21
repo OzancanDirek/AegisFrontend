@@ -3,7 +3,7 @@ import { authFetch } from "./authFetch.js";
 import Sidebar from "./sidebar.jsx";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+import { API_BASE_URL } from "./config";
 
 const STATUS_COLS = [
   { key: "PENDING", label: "Bekliyor", color: "#6b8099" },
@@ -135,16 +135,16 @@ export default function AssignmentManager() {
   };
 
   const fetchAssignments = () =>
-    authFetch(`${API}/assignments`)
+    authFetch(`${API_BASE_URL}/assignments`)
       .then((r) => r.json())
       .then(setAssignments);
 
   useEffect(() => {
     Promise.all([
-      authFetch(`${API}/assignments`).then((r) => r.json()),
-      authFetch(`${API}/volunteer`).then((r) => r.json()),
-      authFetch(`${API}/teams/getAllTeams`).then((r) => r.json()),
-      authFetch(`${API}/aid-requests`).then((r) => r.json()),
+      authFetch(`${API_BASE_URL}/assignments`).then((r) => r.json()),
+      authFetch(`${API_BASE_URL}/volunteer`).then((r) => r.json()),
+      authFetch(`${API_BASE_URL}/teams/getAllTeams`).then((r) => r.json()),
+      authFetch(`${API_BASE_URL}/aid-requests`).then((r) => r.json()),
     ])
       .then(([a, v, t, r]) => {
         setAssignments(Array.isArray(a) ? a : a.assignments || []);
@@ -178,7 +178,7 @@ export default function AssignmentManager() {
         teamId: form.teamId ? parseInt(form.teamId) : null,
         notes: form.notes || null,
       };
-      const res = await authFetch(`${API}/assignments`, {
+      const res = await authFetch(`${API_BASE_URL}/assignments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -206,7 +206,7 @@ export default function AssignmentManager() {
         status: editStatus || null,
         notes: editNotes || null,
       };
-      const res = await authFetch(`${API}/assignments`, {
+      const res = await authFetch(`${API_BASE_URL}/assignments`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -227,7 +227,7 @@ export default function AssignmentManager() {
   const handleDelete = async (id) => {
     if (!window.confirm("Bu görevi silmek istiyor musunuz?")) return;
     try {
-      const res = await authFetch(`${API}/assignments/${id}`, {
+      const res = await authFetch(`${API_BASE_URL}/assignments/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();

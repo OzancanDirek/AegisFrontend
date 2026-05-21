@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const TEAM_TYPE_CONFIG = {
   ARAMA_KURTARMA: {
@@ -285,13 +286,13 @@ export default function Teams() {
 
   useEffect(() => {
     fetchTeams();
-    authFetch(`${API}/UserRole/users`)
+    authFetch(`${API_BASE_URL}/UserRole/users`)
       .then((r) => r.json())
       .then((d) => setUsers(Array.isArray(d.users) ? d.users : []));
   }, []);
 
   const fetchTeams = () =>
-    authFetch(`${API}/teams/getAllTeams`)
+    authFetch(`${API_BASE_URL}/teams/getAllTeams`)
       .then((r) => r.json())
       .then((d) => setTeams(Array.isArray(d) ? d : []));
 
@@ -310,7 +311,7 @@ export default function Teams() {
     if (!cForm.teamName.trim()) return notify("Takım adı boş olamaz", "err");
     setBusy("create");
     try {
-      const res = await authFetch(`${API}/teams`, {
+      const res = await authFetch(`${API_BASE_URL}/teams`, {
         method: "POST",
         body: JSON.stringify(cForm),
       });
@@ -345,7 +346,7 @@ export default function Teams() {
     if (!eForm.teamName.trim()) return notify("Takım adı boş olamaz", "err");
     setBusy("update");
     try {
-      const res = await authFetch(`${API}/teams/update`, {
+      const res = await authFetch(`${API_BASE_URL}/teams/update`, {
         method: "PUT",
         body: JSON.stringify(eForm),
       });
@@ -367,7 +368,7 @@ export default function Teams() {
     if (!window.confirm("Bu takımı silmek istediğinize emin misiniz?")) return;
     setBusy("delete");
     try {
-      const res = await authFetch(`${API}/teams/${teamId}`, {
+      const res = await authFetch(`${API_BASE_URL}/teams/${teamId}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -386,7 +387,7 @@ export default function Teams() {
     if (selUsers.size === 0) return notify("En az bir kullanıcı seçin", "err");
     setBusy("add");
     try {
-      const res = await authFetch(`${API}/teams/add-members`, {
+      const res = await authFetch(`${API_BASE_URL}/teams/add-members`, {
         method: "POST",
         body: JSON.stringify({
           teamId: selected.teamId,
@@ -409,7 +410,7 @@ export default function Teams() {
 
   const handleRemove = async (userId) => {
     try {
-      const res = await authFetch(`${API}/teams/remove-member`, {
+      const res = await authFetch(`${API_BASE_URL}/teams/remove-member`, {
         method: "POST",
         body: JSON.stringify({ teamId: selected.teamId, userId }),
       });

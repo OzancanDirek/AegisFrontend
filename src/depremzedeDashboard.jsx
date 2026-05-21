@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "./authFetch.js";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar.jsx";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api";
+
 
 const STATUS_MAP = {
   PENDING: { label: "Beklemede", color: "#6b8099" },
@@ -118,7 +119,7 @@ export default function DepremzedeDashboard() {
 
   const fetchData = async () => {
     try {
-      const hhRes = await authFetch(`${API}/aid-requests/my-household`);
+      const hhRes = await authFetch(`${API_BASE_URL}/aid-requests/my-household`);
 
       if (hhRes.status === 404 || hhRes.status === 204) {
         setHousehold(null);
@@ -131,7 +132,7 @@ export default function DepremzedeDashboard() {
 
       if (hh?.householdId) {
         const reqRes = await authFetch(
-          `${API}/aid-requests/household/${hh.householdId}`,
+          `${API_BASE_URL}/aid-requests/household/${hh.householdId}`,
         );
         const reqs = await reqRes.json();
         setRequests(Array.isArray(reqs) ? reqs : []);

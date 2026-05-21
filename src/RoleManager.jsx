@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "./authFetch";
+import { API_BASE_URL } from "./config";
 import Sidebar from "./sidebar";
 import Header from "./Header.jsx";
 
-const API = "http://localhost:8080/api/UserRole";
+const ROLE_API = `${API_BASE_URL}/UserRole`;
 
 const roleColors = {
   ADMIN: { bg: "rgba(239,68,68,0.15)", border: "#ef4444", text: "#ef4444" },
@@ -43,42 +44,25 @@ const CSS = `
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
-  .rm-shell {
-    display: grid;
-    grid-template-rows: var(--header-h) 1fr var(--footer-h);
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-areas: "header header" "sidebar main" "footer footer";
-    height: 100vh; width: 100vw;
-  }
+  .rm-shell { display: grid; grid-template-rows: var(--header-h) 1fr var(--footer-h); grid-template-columns: var(--sidebar-w) 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; height: 100vh; width: 100vw; }
   .rm-main { grid-area: main; padding: 24px; overflow-y: auto; background: var(--bg); }
-  .rm-toast {
-    position: fixed; top: 18px; right: 22px; z-index: 9999;
-    padding: 10px 18px; border-radius: var(--radius);
-    font-family: var(--font-body); font-size: 13px; font-weight: 600;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.5); border: 1px solid; animation: rmSlide .2s ease;
-  }
+  .rm-toast { position: fixed; top: 18px; right: 22px; z-index: 9999; padding: 10px 18px; border-radius: var(--radius); font-family: var(--font-body); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.5); border: 1px solid; animation: rmSlide .2s ease; }
   .rm-toast.success { background: rgba(62,207,90,.1); border-color: #3ecf5a; color: #3ecf5a; }
   .rm-toast.error   { background: rgba(239,68,68,.1);  border-color: #ef4444; color: #ef4444; }
   @keyframes rmSlide { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-
   .rm-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100vh - var(--header-h) - var(--footer-h) - 48px); }
   .rm-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
   .rm-panel-head { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .rm-panel-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
   .rm-panel-count { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25); color: var(--accent); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: var(--font-body); }
-
-  /* Sekmeler */
   .rm-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .rm-tab { flex: 1; padding: 10px; font-size: 12px; font-weight: 700; font-family: var(--font-head); color: var(--muted); background: transparent; border: none; cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; }
   .rm-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(245,166,35,.04); }
   .rm-tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
-
   .rm-search-wrap { padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .rm-search { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s; }
   .rm-search:focus { border-color: rgba(245,166,35,.5); }
   .rm-search::placeholder { color: var(--muted); }
-
   .rm-user-list { overflow-y: auto; flex: 1; }
   .rm-user-btn { width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--muted); cursor: pointer; text-align: left; transition: background .12s; font-family: var(--font-body); }
   .rm-user-btn:hover { background: var(--surface2); color: var(--text); }
@@ -87,19 +71,17 @@ const CSS = `
   .rm-user-btn.active .rm-avatar { background: rgba(245,166,35,.18); border-color: rgba(245,166,35,.4); color: var(--accent); }
   .rm-uinfo { flex: 1; display: flex; flex-direction: column; gap: 1px; }
   .rm-uname { font-size: 13px; font-weight: 500; color: var(--text); }
-  .rm-uid   { font-size: 11px; color: var(--muted); }
+  .rm-uid { font-size: 11px; color: var(--muted); }
   .rm-active-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   .rm-empty { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
   .rm-empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; }
   .rm-empty-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; }
   .rm-empty-txt { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
-
-  /* Rol atama alanı */
   .rm-assign-area { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
   .rm-ucard { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
   .rm-ucard-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: rgba(245,166,35,.15); border: 1.5px solid rgba(245,166,35,.4); color: var(--accent); }
   .rm-ucard-name { font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--font-head); }
-  .rm-ucard-id   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .rm-ucard-id { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .rm-section { display: flex; flex-direction: column; gap: 8px; }
   .rm-section-lbl { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
   .rm-role-tags { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -116,8 +98,6 @@ const CSS = `
   .rm-assign-btn { width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--accent); color: #0d1117; font-size: 13px; font-weight: 700; font-family: var(--font-head); cursor: pointer; transition: background .15s, opacity .15s; margin-top: auto; }
   .rm-assign-btn:hover:not(:disabled) { background: var(--accent2); }
   .rm-assign-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-  /* Rol yönetimi paneli */
   .rm-role-mgmt { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
   .rm-role-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color .15s; }
   .rm-role-row:hover { border-color: rgba(245,166,35,.3); }
@@ -128,8 +108,6 @@ const CSS = `
   .rm-icon-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
   .rm-icon-btn:hover { color: var(--text); border-color: var(--muted); }
   .rm-icon-btn.danger:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,.08); }
-
-  /* Yeni rol / düzenleme formu */
   .rm-form { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
   .rm-form-title { font-size: 12px; font-weight: 700; font-family: var(--font-head); color: var(--accent); letter-spacing: .5px; }
   .rm-input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 9px 12px; font-size: 13px; font-family: var(--font-body); outline: none; transition: border-color .2s; width: 100%; }
@@ -143,11 +121,8 @@ const CSS = `
   .rm-btn-secondary:hover { color: var(--text); border-color: var(--muted); }
   .rm-add-btn { width: 100%; padding: 10px; border-radius: var(--radius); border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; font-family: var(--font-head); cursor: pointer; transition: all .15s; margin-top: auto; }
   .rm-add-btn:hover { border-color: rgba(245,166,35,.4); color: var(--accent); background: rgba(245,166,35,.04); }
-
   .al-footer { grid-area: footer; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-  .al-footer-l { font-size: 12px; color: var(--muted); }
-  .al-footer-l strong { color: var(--accent); }
-  .al-footer-r { font-size: 12px; color: var(--muted); }
+  .al-footer-l { font-size: 12px; color: var(--muted); } .al-footer-l strong { color: var(--accent); } .al-footer-r { font-size: 12px; color: var(--muted); }
   .al-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ecf5a; margin-right: 7px; animation: blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 `;
@@ -161,13 +136,9 @@ export default function RoleManager() {
   const [assigning, setAssigning] = useState(false);
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState("");
-
-  // sağ panel sekme: "assign" | "manage"
   const [rightTab, setRightTab] = useState("assign");
-
-  // rol yönetimi state
   const [showForm, setShowForm] = useState(false);
-  const [editingRole, setEditingRole] = useState(null); // null = yeni, obje = düzenle
+  const [editingRole, setEditingRole] = useState(null);
   const [formName, setFormName] = useState("");
   const [formDesc, setFormDesc] = useState("");
   const [formBusy, setFormBusy] = useState(false);
@@ -178,14 +149,14 @@ export default function RoleManager() {
   };
 
   const fetchRoles = () =>
-    authFetch(`${API}/all`)
+    authFetch(`${ROLE_API}/all`)
       .then((r) => r.json())
       .then((d) => setRoles(d.roles || []));
 
   useEffect(() => {
     Promise.all([
-      authFetch(`${API}/users`).then((r) => r.json()),
-      authFetch(`${API}/all`).then((r) => r.json()),
+      authFetch(`${ROLE_API}/users`).then((r) => r.json()),
+      authFetch(`${ROLE_API}/all`).then((r) => r.json()),
     ])
       .then(([uData, rData]) => {
         setUsers(uData.users || []);
@@ -196,7 +167,9 @@ export default function RoleManager() {
   }, []);
 
   const loadUserRoles = async (userId) => {
-    const data = await authFetch(`${API}/user/${userId}`).then((r) => r.json());
+    const data = await authFetch(`${ROLE_API}/user/${userId}`).then((r) =>
+      r.json(),
+    );
     return data.roles || [];
   };
 
@@ -213,14 +186,14 @@ export default function RoleManager() {
     setAssigning(true);
     try {
       const res = await authFetch(
-        `${API}/assign?userId=${getUserId(selected)}&roleId=${selectedRole}`,
+        `${ROLE_API}/assign?userId=${getUserId(selected)}&roleId=${selectedRole}`,
         { method: "POST" },
       );
       const data = await res.json();
       showToast(data.message || "Rol atandı!", "success");
       const updatedRoles = await loadUserRoles(getUserId(selected));
       setSelected((prev) => ({ ...prev, currentRoles: updatedRoles }));
-      const uData = await authFetch(`${API}/users`).then((r) => r.json());
+      const uData = await authFetch(`${ROLE_API}/users`).then((r) => r.json());
       setUsers(uData.users || []);
     } catch {
       showToast("Rol atanamadı", "error");
@@ -229,21 +202,18 @@ export default function RoleManager() {
     }
   };
 
-  // --- Rol yönetimi işlemleri ---
   const openCreate = () => {
     setEditingRole(null);
     setFormName("");
     setFormDesc("");
     setShowForm(true);
   };
-
   const openEdit = (role) => {
     setEditingRole(role);
     setFormName(getRoleName(role));
     setFormDesc(role.description || "");
     setShowForm(true);
   };
-
   const closeForm = () => {
     setShowForm(false);
     setEditingRole(null);
@@ -256,8 +226,7 @@ export default function RoleManager() {
     setFormBusy(true);
     try {
       if (editingRole) {
-        // Güncelle
-        const res = await authFetch(`${API}/roles`, {
+        const res = await authFetch(`${ROLE_API}/roles`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -272,8 +241,7 @@ export default function RoleManager() {
           data.success ? "success" : "error",
         );
       } else {
-        // Oluştur
-        const res = await authFetch(`${API}/roles`, {
+        const res = await authFetch(`${ROLE_API}/roles`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -299,7 +267,7 @@ export default function RoleManager() {
   const handleDeleteRole = async (roleId) => {
     if (!window.confirm("Bu rolü silmek istediğinize emin misiniz?")) return;
     try {
-      const res = await authFetch(`${API}/roles/${roleId}`, {
+      const res = await authFetch(`${ROLE_API}/roles/${roleId}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -322,14 +290,11 @@ export default function RoleManager() {
           {toast.type === "success" ? "✓" : "✕"} {toast.msg}
         </div>
       )}
-
       <div className="rm-shell">
         <Header />
         <Sidebar />
-
         <main className="rm-main">
           <div className="rm-content">
-            {/* SOL PANEL — kullanıcı listesi */}
             <div className="rm-panel">
               <div className="rm-panel-head">
                 <span className="rm-panel-title">Kullanıcılar</span>
@@ -374,7 +339,6 @@ export default function RoleManager() {
               </div>
             </div>
 
-            {/* SAĞ PANEL — sekmeli */}
             <div className="rm-panel">
               <div className="rm-panel-head">
                 <span className="rm-panel-title">
@@ -389,7 +353,6 @@ export default function RoleManager() {
                   <span className="rm-panel-count">{roles.length} rol</span>
                 )}
               </div>
-
               <div className="rm-tabs">
                 <button
                   className={`rm-tab ${rightTab === "assign" ? "active" : ""}`}
@@ -405,7 +368,6 @@ export default function RoleManager() {
                 </button>
               </div>
 
-              {/* ROL ATAMA SEKMESİ */}
               {rightTab === "assign" && (
                 <>
                   {!selected ? (
@@ -432,7 +394,6 @@ export default function RoleManager() {
                           </div>
                         </div>
                       </div>
-
                       <div className="rm-section">
                         <div className="rm-section-lbl">Mevcut Rol</div>
                         <div className="rm-role-tags">
@@ -461,7 +422,6 @@ export default function RoleManager() {
                           )}
                         </div>
                       </div>
-
                       <div className="rm-section">
                         <div className="rm-section-lbl">Yeni Rol Seç</div>
                         <div className="rm-role-grid">
@@ -494,7 +454,6 @@ export default function RoleManager() {
                           })}
                         </div>
                       </div>
-
                       <button
                         className="rm-assign-btn"
                         onClick={handleAssign}
@@ -507,7 +466,6 @@ export default function RoleManager() {
                 </>
               )}
 
-              {/* ROL YÖNETİMİ SEKMESİ */}
               {rightTab === "manage" && (
                 <div className="rm-role-mgmt">
                   {showForm && (
@@ -548,7 +506,6 @@ export default function RoleManager() {
                       </div>
                     </div>
                   )}
-
                   {roles.length === 0 ? (
                     <div className="rm-empty">Henüz rol yok</div>
                   ) : (
@@ -587,7 +544,6 @@ export default function RoleManager() {
                       );
                     })
                   )}
-
                   {!showForm && (
                     <button className="rm-add-btn" onClick={openCreate}>
                       + Yeni Rol Ekle
@@ -598,7 +554,6 @@ export default function RoleManager() {
             </div>
           </div>
         </main>
-
         <footer className="al-footer">
           <div className="al-footer-l">
             <span className="al-dot" />
