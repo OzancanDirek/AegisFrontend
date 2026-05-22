@@ -36,6 +36,11 @@ React-based frontend for the **Aegis Disaster Management System**, developed to 
 
 <img width="3412" height="2056" alt="WarehouseMap" src="https://github.com/user-attachments/assets/369bf3de-2e5c-4127-af08-a1bc2061c753" />
 
+### Warehouse Stock
+
+<img width="1703" height="1031" alt="WarehouseStock" src="https://github.com/user-attachments/assets/d9870c02-239d-4b5c-b60b-6048545e7f54" />
+
+
 ### Aid Requests
 
 <img width="1706" height="1029" alt="Requests" src="https://github.com/user-attachments/assets/2f10d6de-755d-402e-9b20-d75bce91039c" />
@@ -47,6 +52,10 @@ React-based frontend for the **Aegis Disaster Management System**, developed to 
 ### Notifications
 
 <img width="1705" height="1005" alt="Notifications" src="https://github.com/user-attachments/assets/49e6ee3d-8893-4dd6-861f-c0eb7b59f270" />
+
+### Adresses
+<img width="1710" height="1030" alt="Adresses" src="https://github.com/user-attachments/assets/be514c2b-13ff-4c01-8087-81a8de33f7cc" />
+
 
 ---
 
